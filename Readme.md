@@ -1,7 +1,7 @@
 # Личный проект «Что посмотреть»
 
 * Студент: [Андрей Фомин](https://up.htmlacademy.ru/nodejs-api/3/user/2105279).
-* Наставник: `Неизвестно`.
+* Наставник: [Владислав Зубко](https://htmlacademy.ru/profile/whatislove).
 
 ---
 
