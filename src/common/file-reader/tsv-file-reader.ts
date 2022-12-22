@@ -20,7 +20,7 @@ export default class TSVFileReader implements FileReaderInterface {
     return this.rawData
       .split('\n')
       .filter((row) => row.trim() !== '')
-      .map((line) => line.split(','))
+      .map((line) => line.split('\t'))
       .map(([id, name, description, publicationDate, genre, released, rating, previewVideoLink, videoLink, actors, producer, runTime, userId, posterImage, backgroundImage, color]) => ({
         id: Number(id),
         name,
@@ -31,7 +31,7 @@ export default class TSVFileReader implements FileReaderInterface {
         rating: Number(rating),
         previewVideoLink,
         videoLink,
-        actors: actors.split('\t'),
+        actors: actors.split(','),
         producer,
         runTime: Number(runTime),
         commentAmount: 0,
