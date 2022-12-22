@@ -1,5 +1,3 @@
-import { User } from './user.type.js';
-
 export enum Genre {
   comedy, crime, documentary, drama, horror, family, romance, scifi, thriller
 }
@@ -16,10 +14,10 @@ export type Film = {
   videoLink: string;
   actors: string[];
   producer: string;
-  duration: number;
-  commentCount: number;
-  user: User;
+  runTime: number;
+  commentAmount: number;
+  userId: number;
   posterImage: string;
   backgroundImage: string;
-  color: number;
+  color: string;
 };
