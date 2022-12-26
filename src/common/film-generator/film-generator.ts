@@ -12,15 +12,15 @@ const MAX_AMOUNT_COMMENT = 30;
 const MAX_USER_ID = 100;
 const colors = ['red', 'blue', 'yellow', 'green', 'black', 'white'];
 
-export default class OfferGenerator implements FilmGeneratorInterface {
+export default class FilmGenerator implements FilmGeneratorInterface {
   constructor(private readonly mockData: MockData) { }
 
   public generate(id: number): string {
     const name = getRandomItem<string>(this.mockData.names);
     const description = getRandomItem<string>(this.mockData.descriptions);
-    const publicationDate = new Date();
+    const publicationDate = dayjs().toString();
     const genre = getRandomItem(this.mockData.genres);
-    const released = dayjs().subtract(generateRandomValue(0, OLD_YEAR), 'year').toString();
+    const released = dayjs().subtract(generateRandomValue(0, OLD_YEAR), 'year').format('YYYY');
     const rating = generateRandomValue(0, MAX_RATING, RATING_DECIMAL);
     const previewVideoLink = getRandomItems(this.mockData.previewVideoLinks);
     const videoLink = getRandomItems(this.mockData.videoLinks);

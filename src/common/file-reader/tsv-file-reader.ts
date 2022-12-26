@@ -27,7 +27,7 @@ export default class TSVFileReader implements FileReaderInterface {
         description,
         publicationDate,
         genre: genre as unknown as Genre,
-        released: Number(released),
+        released,
         rating: Number(rating),
         previewVideoLink,
         videoLink,
