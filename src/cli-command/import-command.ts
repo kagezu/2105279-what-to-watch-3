@@ -6,8 +6,8 @@ export default class ImportCommand implements CliCommandInterface {
   public readonly name = '--import';
 
   private onLine(line: string) {
-    const offer = createFilm(line);
-    console.log(offer);
+    const film = createFilm(line);
+    console.log(film);
   }
 
   private onComplete(count: number) {

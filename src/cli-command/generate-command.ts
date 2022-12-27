@@ -1,4 +1,5 @@
 import got from 'got';
+import chalk from 'chalk';
 import { MockData } from '../types/mock-data.type.js';
 import { CliCommandInterface } from './cli-command.interface.js';
 import FilmGenerator from '../common/film-generator/film-generator.js';
@@ -23,6 +24,8 @@ export default class GenerateCommand implements CliCommandInterface {
 
     for (let i = 0; i < filmCount; i++) {
       await tsvFileWriter.write(filmGeneratorString.generate(i));
+      console.clear();
+      console.log('Progress: ', chalk.yellow(`${Math.round(i / filmCount * 100)}% `), 'complete');
     }
 
     console.log(`File ${filepath} was created!`);
