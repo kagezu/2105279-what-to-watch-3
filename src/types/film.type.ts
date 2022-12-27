@@ -8,7 +8,7 @@ export type Film = {
   description: string;
   publicationDate: string;
   genre: Genre;
-  released: number;
+  released: string;
   rating: number;
   previewVideoLink: string;
   videoLink: string;
