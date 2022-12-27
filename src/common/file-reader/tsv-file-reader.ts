@@ -1,44 +1,39 @@
-import { readFileSync } from 'fs';
+import EventEmitter from 'events';
+import { createReadStream } from 'fs';
 import { FileReaderInterface } from './file-reader.interface.js';
 
-import { Genre, Film } from '../../types/film.type.js';
-
-export default class TSVFileReader implements FileReaderInterface {
-  private rawData = '';
-
-  constructor(public filename: string) { }
-
-  public read(): void {
-    this.rawData = readFileSync(this.filename, { encoding: 'utf8' });
+export default class TSVFileReader extends EventEmitter implements FileReaderInterface {
+  constructor(public filename: string) {
+    super();
   }
 
-  public toArray(): Film[] {
-    if (!this.rawData) {
-      return [];
+  public async read(): Promise<void> {
+    const stream = createReadStream(this.filename, {
+      highWaterMark: 16384, // 16KB
+      encoding: 'utf-8',
+    });
+
+    let lineRead = '';
+    let endLinePosition = -1;
+    let importedRowCount = 0;
+
+    for await (const chunk of stream) {
+      lineRead += chunk.toString();
+
+      while (lineRead) {
+        endLinePosition = lineRead.indexOf('\n');
+        if (endLinePosition < 0) {
+          break;
+        }
+
+        const completeRow = lineRead.slice(0, endLinePosition + 1);
+        lineRead = lineRead.slice(++endLinePosition);
+        importedRowCount++;
+
+        this.emit('line', completeRow);
+      }
     }
 
-    return this.rawData
-      .split('\n')
-      .filter((row) => row.trim() !== '')
-      .map((line) => line.split('\t'))
-      .map(([id, name, description, publicationDate, genre, released, rating, previewVideoLink, videoLink, actors, producer, runTime, userId, posterImage, backgroundImage, color]) => ({
-        id: Number(id),
-        name,
-        description,
-        publicationDate,
-        genre: genre as unknown as Genre,
-        released,
-        rating: Number(rating),
-        previewVideoLink,
-        videoLink,
-        actors: actors.split(','),
-        producer,
-        runTime: Number(runTime),
-        commentAmount: 0,
-        userId: Number(userId),
-        posterImage,
-        backgroundImage,
-        color
-      }));
+    this.emit('end', importedRowCount);
   }
 }
