@@ -1,25 +1,31 @@
-import { ConfigInterface } from './config.interface.js';
-import { config, DotenvParseOutput } from 'dotenv';
-import { LoggerInterface } from '../logger/logger.interface.js';
+import convict from 'convict';
+import validator from 'convict-format-with-validator';
 
-export default class ConfigService implements ConfigInterface {
-  private config: DotenvParseOutput;
-  private logger: LoggerInterface;
+convict.addFormats(validator);
 
-  constructor(logger: LoggerInterface) {
-    this.logger = logger;
-
-    const parsedOutput = config();
-
-    if (parsedOutput.error) {
-      throw new Error('Can\'t read .env file. Perhaps the file does not exists.');
-    }
-
-    this.config = <DotenvParseOutput>parsedOutput.parsed;
-    this.logger.info('.env file found and successfully parsed!');
-  }
-
-  public get(key: string): string | undefined {
-    return this.config[key];
-  }
+export type ConfigSchema = {
+  PORT: number;
+  SALT: string;
+  DB_HOST: string;
 }
+
+export const configSchema = convict<ConfigSchema>({
+  PORT: {
+    doc: 'Port for incoming connections',
+    format: 'port',
+    env: 'PORT',
+    default: 4000
+  },
+  SALT: {
+    doc: 'Salt for password hash',
+    format: String,
+    env: 'SALT',
+    default: null
+  },
+  DB_HOST: {
+    doc: 'IP address of the database server (MongoDB)',
+    format: 'ipaddress',
+    env: 'DB_HOST',
+    default: '127.0.0.1'
+  }
+});
