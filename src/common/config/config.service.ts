@@ -1,31 +1,32 @@
-import convict from 'convict';
-import validator from 'convict-format-with-validator';
+import { config } from 'dotenv';
+import { inject, injectable } from 'inversify';
+import { ConfigInterface } from './config.interface.js';
+import { LoggerInterface } from '../logger/logger.interface.js';
+import { configSchema, ConfigSchema } from './config.schema.js';
+import { Component } from '../../types/component.types.js';
 
-convict.addFormats(validator);
+@injectable()
+export default class ConfigService implements ConfigInterface {
+  private config: ConfigSchema;
+  private logger: LoggerInterface;
 
-export type ConfigSchema = {
-  PORT: number;
-  SALT: string;
-  DB_HOST: string;
-}
+  constructor(@inject(Component.LoggerInterface) logger: LoggerInterface) {
+    this.logger = logger;
 
-export const configSchema = convict<ConfigSchema>({
-  PORT: {
-    doc: 'Port for incoming connections',
-    format: 'port',
-    env: 'PORT',
-    default: 4000
-  },
-  SALT: {
-    doc: 'Salt for password hash',
-    format: String,
-    env: 'SALT',
-    default: null
-  },
-  DB_HOST: {
-    doc: 'IP address of the database server (MongoDB)',
-    format: 'ipaddress',
-    env: 'DB_HOST',
-    default: '127.0.0.1'
+    const parsedOutput = config();
+
+    if (parsedOutput.error) {
+      throw new Error('Can\'t read .env file. Perhaps the file does not exists.');
+    }
+
+    configSchema.load({});
+    configSchema.validate({ allowed: 'strict', output: this.logger.info });
+
+    this.config = configSchema.getProperties();
+    this.logger.info('.env file found and successfully parsed!');
   }
-});
+
+  public get<T extends keyof ConfigSchema>(key: T) {
+    return this.config[key];
+  }
+}
