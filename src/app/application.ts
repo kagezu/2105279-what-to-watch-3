@@ -35,9 +35,9 @@ export default class Application {
 
     //
     const user = {
-      email: 'test@mail.ts',
-      avatarPath: '123.jpg',
-      name: 'one',
+      email: 'test09@mail.ts',
+      avatarPath: '1230j.jpg',
+      name: 'two-09',
       password: '12345'
     };
     const mainContainer = Container.merge(
@@ -46,7 +46,9 @@ export default class Application {
     );
 
     const userService = mainContainer.get<UserServiceInterface>(Component.UserServiceInterface);
-    userService.findOrCreate(user, this.config.get('SALT'));
+    await userService.findOrCreate(user, this.config.get('SALT'));
 
+
+    await this.databaseClient.disconnect();
   }
 }

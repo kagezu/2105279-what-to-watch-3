@@ -7,7 +7,7 @@ import { Component } from '../../types/component.types.js';
 
 const userContainer = new Container();
 
-userContainer.bind<UserServiceInterface>(Component.UserServiceInterface).to(UserService);
+userContainer.bind<UserServiceInterface>(Component.UserServiceInterface).to(UserService).inSingletonScope();
 userContainer.bind<types.ModelType<UserEntity>>(Component.UserModel).toConstantValue(UserModel);
 
 export { userContainer };
