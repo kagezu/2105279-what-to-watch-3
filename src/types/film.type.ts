@@ -1,9 +1,16 @@
 export enum Genre {
-  comedy, crime, documentary, drama, horror, family, romance, scifi, thriller
+  Comedy = 'comedy',
+  Crime = 'crime',
+  Documentary = 'documentary',
+  Drama = 'drama',
+  Horror = 'horror',
+  Family = 'family',
+  Romance = 'romance',
+  Scifi = 'scifi',
+  Thriller = 'thriller'
 }
 
 export type Film = {
-  id: number;
   name: string;
   description: string;
   publicationDate: string;
@@ -16,7 +23,7 @@ export type Film = {
   producer: string;
   runTime: number;
   commentAmount: number;
-  userId: number;
+  userId: string;
   posterImage: string;
   backgroundImage: string;
   color: string;
