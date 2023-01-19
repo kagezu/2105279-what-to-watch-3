@@ -3,6 +3,10 @@ import typegoose, { getModelForClass, defaultClasses } from '@typegoose/typegoos
 import { createSHA256 } from '../../utils/common.js';
 
 const { prop, modelOptions } = typegoose;
+enum UserOption {
+  MinLengthName = 1,
+  MaxLengthName = 150
+}
 
 export interface UserEntity extends defaultClasses.Base { }
 
@@ -23,21 +27,21 @@ export class UserEntity extends defaultClasses.TimeStamps implements User {
   @prop({
     unique: true,
     required: true,
-    match: [/^([\w-\\.]+@([\w-]+\.)+[\w-]{2,4})?$/, 'Email is incorrect']
+    // match: [/^([\w-\\.]+@([\w-]+\.)+[\w-]{2,4})?$/, 'Email is incorrect']
   })
   public email!: string;
 
   @prop({
     default: '',
-    match: [/\.(?:jpg||png)$|^$/, 'png or jpg format only']
+    // match: [/\.(?:jpg||png)$|^$/, 'png or jpg format only']
   })
   public avatarPath!: string;
 
   @prop({
     unique: true,
     required: true,
-    minlength: [1, 'Min length for firstname is 1'],
-    maxlength: [15, 'Max length for firstname is 15']
+    minlength: [UserOption.MinLengthName, `Min length for name is ${UserOption.MinLengthName}`],
+    maxlength: [UserOption.MaxLengthName, `Max length for name is ${UserOption.MaxLengthName}`]
   })
   public name!: string;
 

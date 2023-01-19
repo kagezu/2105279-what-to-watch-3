@@ -8,4 +8,5 @@ export type MockData = {
   producers: string[];
   posterImages: string[];
   backgroundImages: string[];
+  email: string[];
 };

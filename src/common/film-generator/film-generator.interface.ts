@@ -1,3 +1,3 @@
 export interface FilmGeneratorInterface {
-  generate(id: number): string;
+  generate(): string;
 }

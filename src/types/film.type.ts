@@ -23,7 +23,7 @@ export type Film = {
   producer: string;
   runTime: number;
   commentAmount: number;
-  // userId: string;
+  userId: string;
   posterImage: string;
   backgroundImage: string;
   color: string;

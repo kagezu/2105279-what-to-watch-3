@@ -22,7 +22,7 @@ export interface FilmEntity extends defaultClasses.Base { }
     collection: 'films'
   }
 })
-export class FilmEntity extends defaultClasses.TimeStamps implements Film {
+export class FilmEntity extends defaultClasses.TimeStamps {
   constructor(data: Film) {
     super();
 
@@ -130,14 +130,14 @@ export class FilmEntity extends defaultClasses.TimeStamps implements Film {
   @prop({
     required: true,
     default: '',
-    match: [/\.(?:jpg)$/, 'jpg format only']
+    // match: [/\.(?:jpg)$/, 'jpg format only']
   })
   public posterImage!: string;
 
   @prop({
-    required: true,
+    // required: true,
     default: '',
-    match: [/\.(?:jpg)$/, 'jpg format only']
+    // match: [/\.(?:jpg)$/, 'jpg format only']
   })
   public backgroundImage!: string;
 

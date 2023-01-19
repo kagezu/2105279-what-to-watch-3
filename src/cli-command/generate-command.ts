@@ -23,7 +23,7 @@ export default class GenerateCommand implements CliCommandInterface {
     const tsvFileWriter = new TSVFileWriter(filepath);
 
     for (let i = 0; i < filmCount; i++) {
-      await tsvFileWriter.write(filmGeneratorString.generate(i));
+      await tsvFileWriter.write(filmGeneratorString.generate());
       console.clear();
       console.log('Progress: ', chalk.yellow(`${Math.round(i / filmCount * 100)}% `), 'complete');
     }

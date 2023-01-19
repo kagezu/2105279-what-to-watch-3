@@ -9,13 +9,12 @@ const RATING_DECIMAL = 1;
 const MIN_RUN_TIME = 80;
 const MAX_RUN_TIME = 150;
 const MAX_AMOUNT_COMMENT = 30;
-const MAX_USER_ID = 100;
 const colors = ['red', 'blue', 'yellow', 'green', 'black', 'white'];
 
 export default class FilmGenerator implements FilmGeneratorInterface {
   constructor(private readonly mockData: MockData) { }
 
-  public generate(id: number): string {
+  public generate(): string {
     const name = getRandomItem<string>(this.mockData.names);
     const description = getRandomItem<string>(this.mockData.descriptions);
     const publicationDate = dayjs().toString();
@@ -28,13 +27,16 @@ export default class FilmGenerator implements FilmGeneratorInterface {
     const producer = getRandomItem(this.mockData.producers);
     const runTime = generateRandomValue(MIN_RUN_TIME, MAX_RUN_TIME);
     const commentAmount = generateRandomValue(0, MAX_AMOUNT_COMMENT);
-    const userId = generateRandomValue(0, MAX_USER_ID);
     const posterImage = getRandomItems(this.mockData.posterImages);
     const backgroundImage = getRandomItems(this.mockData.backgroundImages);
     const color = getRandomItem(colors);
 
+    const nameUser = getRandomItem(this.mockData.actors);
+    const email = getRandomItem<string>(this.mockData.email);
+    const avatarPath = getRandomItems(this.mockData.posterImages);
+    const userId = [nameUser, email, avatarPath].join('\t');
+
     return [
-      id,
       name,
       description,
       publicationDate,
