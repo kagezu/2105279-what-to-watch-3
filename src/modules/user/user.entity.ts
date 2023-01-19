@@ -27,13 +27,13 @@ export class UserEntity extends defaultClasses.TimeStamps implements User {
   @prop({
     unique: true,
     required: true,
-    // match: [/^([\w-\\.]+@([\w-]+\.)+[\w-]{2,4})?$/, 'Email is incorrect']
+    match: [/^([\w-\\.]+@([\w-]+\.)+[\w-]{2,4})?$/, 'Email is incorrect']
   })
   public email!: string;
 
   @prop({
     default: '',
-    // match: [/\.(?:jpg||png)$|^$/, 'png or jpg format only']
+    match: [/\.(?:jpg||png)$|^$/, 'png or jpg format only']
   })
   public avatarPath!: string;
 
