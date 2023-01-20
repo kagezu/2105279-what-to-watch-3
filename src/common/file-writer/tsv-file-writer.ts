@@ -8,7 +8,7 @@ export default class TSVFileWriter implements FileWriterInterface {
     this.stream = createWriteStream(this.filename, {
       flags: 'w',
       encoding: 'utf8',
-      highWaterMark: 2 ** 16, // 64KB
+      highWaterMark: 2 ** 16,
       autoClose: true,
     });
   }
