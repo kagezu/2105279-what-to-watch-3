@@ -17,7 +17,8 @@
     "clean": "rimraf dist",
     "ts": "ts-node",
     "mock:server": "json-server ./src/mocks/mock-server-data.json --port 3123",
-    "test": "npm run ts ./src/main.ts | pino-pretty --colorize --translateTime SYS:standard"
+    "generate:dev": "npm run ts ./src/cli.ts -- --generate 1000 ./src/mocks/mock-data.tsv http://localhost:3123/api",
+    "import:dev": "npm run ts ./src/cli.ts -- --import ./src/mocks/mock-data.tsv admin test 127.0.0.1 course-njs1 hghd67hfcxxjfcjh  | pino-pretty --colorize --translateTime SYS:standard"
   },
   "devDependencies": {
     "@types/convict": "6.1.1",

@@ -39,7 +39,7 @@ export default class ImportCommand implements CliCommandInterface {
   }
 
   private async saveFilm(film: Film) {
-    const [name, avatarPath, email] = film.userId.split('\t');
+    const { name, avatarPath, email } = film.user;
     const user = await this.userService.findOrCreate({
       name,
       avatarPath,

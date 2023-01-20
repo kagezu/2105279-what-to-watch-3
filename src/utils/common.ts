@@ -1,15 +1,34 @@
 import crypto from 'crypto';
-import { Genre, Film } from '../types/film.type.js';
+import { Film } from '../types/film.type.js';
 
 export const createFilm = (row: string) => {
   const tokens = row.replace('\n', '').split('\t');
-  const [name, description, publicationDate, genre, released, rating, previewVideoLink, videoLink, actors, producer, runTime, commentAmount, user, email, link, posterImage, backgroundImage, color] = tokens;
+  const [
+    name,
+    description,
+    publicationDate,
+    genre,
+    released,
+    rating,
+    previewVideoLink,
+    videoLink,
+    actors,
+    producer,
+    runTime,
+    commentAmount,
+    posterImage,
+    backgroundImage,
+    color,
+    user,
+    email,
+    avatarPath
+  ] = tokens;
 
   return {
     name,
     description,
     publicationDate,
-    genre: genre as unknown as Genre,
+    genre,
     released,
     rating: Number(rating),
     previewVideoLink,
@@ -18,10 +37,14 @@ export const createFilm = (row: string) => {
     producer,
     runTime: Number(runTime),
     commentAmount: Number(commentAmount),
-    userId: [user, email, link].join('\t'),
     posterImage,
     backgroundImage,
-    color
+    color,
+    user: {
+      name: user,
+      email,
+      avatarPath
+    }
   } as Film;
 };
 

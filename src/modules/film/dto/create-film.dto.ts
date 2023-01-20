@@ -1,10 +1,8 @@
-import { Genre } from '../../../types/film.type.js';
-
 export default class CreateFilmDto {
   name!: string;
   description!: string;
   publicationDate!: string;
-  genre!: Genre;
+  genre!: string;
   released!: string;
   previewVideoLink!: string;
   videoLink!: string;
