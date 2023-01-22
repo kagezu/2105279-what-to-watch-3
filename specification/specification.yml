@@ -94,6 +94,27 @@ paths:
         "401":
           description: Пользователь не авторизован
 
+  /users/logout:
+    get:
+      tags:
+        - users
+      summary: Завершает сессию пользователя
+      description: Выход из закрытой части приложения
+      parameters:
+        - name: X-Token
+          in: header
+          description: Авторизационный токен пользователя
+          required: true
+          schema:
+            $ref: "#/components/schemas/x-token"
+
+      responses:
+        "204":
+          description: Сеанс завершён
+
+        "403":
+          description: Выход не выполнен
+
 components:
   schemas:
     createUser:
