@@ -115,6 +115,26 @@ paths:
         "403":
           description: Выход не выполнен
 
+  /films:
+    get:
+      tags:
+        - films
+      summary: Получить список фильмов
+      description: Возвращает массив фильмов. Каждый фильм описан в виде объекта.
+
+      responses:
+        "200":
+          description: Массив фильмов
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  allOf:
+                    - $ref: "#/components/schemas/film"
+                    - type: object
+
 components:
   schemas:
     createUser:
@@ -172,3 +192,60 @@ components:
     x-token:
       type: string
       example: 6329c3d6a04ab1061c6425ea
+
+    film:
+      type: object
+      properties:
+        id:
+          type: string
+          example: fs7adf65a76fsafsd67f5
+        name:
+          type: string
+          example: Операция «Ы» и другие приключения Шурика
+        description:
+          type: string
+          example: Инженер-изобретатель Тимофеев сконструировал машину времени, которая соединила его квартиру с далеким шестнадцатым веком - точнее, с палатами государя Ивана Грозного. Туда-то и попадают тезка царя пенсионер-общественник Иван Васильевич Бунша и квартирный вор Жорж Милославский. На их место в двадцатом веке <переселяется> великий государь. Поломка машины времени приводит ко множеству неожиданных и забавных событий...
+        posterImage:
+          type: string
+          example: img/the-grand-budapest-hotel-poster.jpg
+        previewImage:
+          type: string
+          example: img/the-grand-budapest-hotel.jpg
+        backgroundImage:
+          type: string
+          example: img/the-grand-budapest-hotel-bg.jpg
+        backgroundColor:
+          type: string
+          example: "#ffffff"
+        videoLink:
+          type: string
+          example: https://some-link
+        previewVideoLink:
+          type: string
+          example: https://some-link
+        rating:
+          type: number
+          example: 8.9
+        scoresCount:
+          type: number
+          example: 240
+        director:
+          type: string
+          example: Wes Anderson
+        starring:
+          type: array
+          items:
+            type: string
+            example: Bill Murray
+        runTime:
+          type: number
+          example: 99
+        genre:
+          type: string
+          example: Comedy
+        released:
+          type: number
+          example: 2014
+        isFavorite:
+          type: boolean
+          example: false
