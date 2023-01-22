@@ -12,8 +12,6 @@ tags:
     description: Действия с промо фильмом.
   - name: films
     description: Действия с фильмами.
-  - name: genres
-    description: Действия с жанрами.
   - name: comments
     description: Действия с комментариями.
   - name: users
@@ -53,29 +51,60 @@ paths:
       summary: Авторизация пользователя
       description: Авторизует пользователя на основе логина и пароля
 
+      requestBody:
+        description: Информация для авторизации пользователя.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/loginUser"
+        required: true
+
+      responses:
+        "200":
+          description: Пользователь авторизован.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/authorize"
+
+        "401":
+          description: Пользователь не авторизован.
+
     get:
       tags:
         - users
       summary: Проверка состояния пользователя
       description: Возвращает информацию по авторизованному пользователю
+      header:
+        x-token:
+
+      responses:
+        "200":
+          description: Пользователь авторизован.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/user"
+
+        "401":
+          description: Пользователь не авторизован
 
 components:
   schemas:
     createUser:
       type: object
-
       properties:
         email:
           type: string
-          example: keks@htmlacademy.ru
+          example: creamy@htmlacademy.ru
 
-        firstname:
+        avatarPath:
           type: string
-          example: Keks
+          example: /avatar/534545.jpg
 
-        lastname:
+        name:
           type: string
-          example: Cat
+          example: Creamy
 
         password:
           type: string
@@ -83,12 +112,33 @@ components:
 
     user:
       type: object
-
       properties:
-        id:
-          type: string
-          example: 6329c3d6a04ab1061c6425ea
-
         email:
           type: string
-          example: keks@htmlacademy.ru
+          example: creamy@htmlacademy.ru
+
+        avatarPath:
+          type: string
+          example: /avatar/534545.jpg
+
+        name:
+          type: string
+          example: Creamy
+
+    loginUser:
+      type: object
+      properties:
+        email:
+          type: string
+          example: creamy@htmlacademy.ru
+
+        password:
+          type: string
+          example: 123456
+
+    authorize:
+      type: object
+      properties:
+        token:
+          type: string
+          example: 6329c3d6a04ab1061c6425ea
