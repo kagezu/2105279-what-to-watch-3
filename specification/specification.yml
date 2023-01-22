@@ -75,8 +75,13 @@ paths:
         - users
       summary: Проверка состояния пользователя
       description: Возвращает информацию по авторизованному пользователю
-      header:
-        x-token:
+      parameters:
+        - name: X-Token
+          in: header
+          description: Авторизационный токен пользователя
+          required: true
+          schema:
+            $ref: "#/components/schemas/x-token"
 
       responses:
         "200":
@@ -142,3 +147,7 @@ components:
         token:
           type: string
           example: 6329c3d6a04ab1061c6425ea
+
+    x-token:
+      type: string
+      example: 6329c3d6a04ab1061c6425ea
