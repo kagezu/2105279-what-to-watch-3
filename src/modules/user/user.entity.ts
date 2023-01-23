@@ -38,7 +38,6 @@ export class UserEntity extends defaultClasses.TimeStamps implements User {
   public avatarPath!: string;
 
   @prop({
-    // unique: true,
     required: true,
     minlength: [UserOption.MinLengthName, `Min length for name is ${UserOption.MinLengthName}`],
     maxlength: [UserOption.MaxLengthName, `Max length for name is ${UserOption.MaxLengthName}`]
