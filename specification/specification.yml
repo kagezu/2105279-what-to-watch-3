@@ -8,10 +8,10 @@ info:
     url: https://opensource.org/licenses/MIT
   version: 2.0.0
 tags:
-  - name: promo
-    description: Действия с промо фильмом.
   - name: films
     description: Действия с фильмами.
+  - name: favorite
+    description: Действия с фильмами к просмотру.
   - name: comments
     description: Действия с комментариями.
   - name: users
@@ -22,7 +22,7 @@ paths:
     post:
       tags:
         - users
-      summary: Регистрация пользователя
+      summary: Регистрация пользователя.
       description: Регистрирует нового пользователя.
 
       requestBody:
@@ -48,8 +48,8 @@ paths:
     post:
       tags:
         - users
-      summary: Авторизация пользователя
-      description: Авторизует пользователя на основе логина и пароля
+      summary: Авторизация пользователя.
+      description: Авторизует пользователя на основе логина и пароля.
 
       requestBody:
         description: Информация для авторизации пользователя.
@@ -73,8 +73,8 @@ paths:
     get:
       tags:
         - users
-      summary: Проверка состояния пользователя
-      description: Возвращает информацию по авторизованному пользователю
+      summary: Проверка состояния пользователя.
+      description: Возвращает информацию по авторизованному пользователю.
       parameters:
         - name: X-Token
           in: header
@@ -95,11 +95,11 @@ paths:
           description: Пользователь не авторизован
 
   /users/logout:
-    get:
+    delete:
       tags:
         - users
-      summary: Завершает сессию пользователя
-      description: Выход из закрытой части приложения
+      summary: Завершает сессию пользователя.
+      description: Выход из закрытой части приложения.
       parameters:
         - name: X-Token
           in: header
@@ -115,11 +115,27 @@ paths:
         "403":
           description: Выход не выполнен
 
+  /promo:
+    get:
+      tags:
+        - films
+      summary: Получить промо-фильм.
+      description: Возвращает фильм в виде объекта.
+
+      responses:
+        "200":
+          description: Объект фильма
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: "#/components/schemas/filmDetails"
+
   /films:
     get:
       tags:
         - films
-      summary: Получить список фильмов
+      summary: Получить список фильмов.
       description: Возвращает массив фильмов. Каждый фильм описан в виде объекта.
 
       responses:
@@ -134,6 +150,293 @@ paths:
                   allOf:
                     - $ref: "#/components/schemas/film"
                     - type: object
+
+    post:
+      tags:
+        - films
+      summary: Добавить новый фильм.
+      description: Добавляет новый фильм в базу.
+      parameters:
+        - name: X-Token
+          in: header
+          description: Авторизационный токен пользователя
+          required: true
+          schema:
+            $ref: "#/components/schemas/x-token"
+
+      requestBody:
+        description: Информация о фильме.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/filmEdit"
+        required: true
+
+      responses:
+        "200":
+          description: Объект фильма
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: "#/components/schemas/filmDetails"
+
+        "400":
+          description: Валидация не пройдена
+
+        "401":
+          description: Пользователь не авторизован
+
+  /films/{id}:
+    get:
+      tags:
+        - films
+      summary: Получить фильм.
+      description: Возвращает фильм с идентификатором `id`.
+      parameters:
+        - name: id
+          in: path
+          description: Уникальный идентификатор фильма
+          required: true
+          schema:
+            type: string
+            example: 6329c3d6a04ab1061c642
+
+      responses:
+        "200":
+          description: Объект фильма
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/filmDetails"
+
+        "404":
+          description: Фильм не найден
+
+    patch:
+      tags:
+        - films
+      summary: Редактировать информацию о фильме.
+      description: Редактировать информацию о фильме.
+      parameters:
+        - name: X-Token
+          in: header
+          description: Авторизационный токен пользователя
+          required: true
+          schema:
+            $ref: "#/components/schemas/x-token"
+
+      requestBody:
+        description: Информация о фильме.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/filmEdit"
+        required: true
+
+      responses:
+        "200":
+          description: Объект фильма
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: "#/components/schemas/filmDetails"
+
+        "400":
+          description: Валидация не пройдена
+
+        "401":
+          description: Пользователь не авторизован
+
+    delete:
+      tags:
+        - films
+      summary: Удалить фильм с сервера.
+      description: Удаляет фильм из базы данных.
+      parameters:
+        - name: X-Token
+          in: header
+          description: Авторизационный токен пользователя
+          required: true
+          schema:
+            $ref: "#/components/schemas/x-token"
+
+      responses:
+        "200":
+          description: Фильм удалён
+
+        "401":
+          description: Пользователь не авторизован
+
+  /genre/{genre}:
+    get:
+      tags:
+        - films
+      summary: Получить список фильмов c определённым жанром.
+      description: Получить список фильмов c определённым жанром. Каждый фильм описан в виде объекта.
+      parameters:
+        - name: genre
+          in: path
+          description: Жанр
+          required: true
+          schema:
+            type: string
+            example: Comedy
+
+      responses:
+        "200":
+          description: Массив фильмов
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  allOf:
+                    - $ref: "#/components/schemas/film"
+                    - type: object
+
+        "404":
+          description: Фильмы не найдены
+
+  /favorite:
+    get:
+      tags:
+        - favorite
+      summary: Получить список фильмов к просмотру.
+      description: Возвращает массив фильмов. Каждый фильм описан в виде объекта.
+      parameters:
+        - name: X-Token
+          in: header
+          description: Авторизационный токен пользователя
+          required: true
+          schema:
+            $ref: "#/components/schemas/x-token"
+
+      responses:
+        "200":
+          description: Массив фильмов
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  allOf:
+                    - $ref: "#/components/schemas/film"
+                    - type: object
+
+  /favorite/{id}/{status}:
+    post:
+      tags:
+        - favorite
+      summary: Изменить статус «к просмотру» у фильма
+      description: Возвращает фильм с идентификатором `id` с актуальным состоянием к просмотру
+      parameters:
+        - name: id
+          in: path
+          description: Уникальный идентификатор фильма
+          required: true
+          schema:
+            type: string
+            example: yLmNvbm5lckBnbWFpbC5
+        - name: status
+          in: path
+          description: Статус фильма. Может быть `1` или `0`, где `1` добавляет фильма в список «к просмотру», а `0` удаляет
+          required: true
+          schema:
+            type: number
+            example: 1
+        - name: X-Token
+          in: header
+          description: Авторизационный токен пользователя
+          required: true
+          schema:
+            type: string
+            example: yLmNvbm5lckBnbWFpbC5
+
+      responses:
+        "200":
+          description: Объект фильма
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/film"
+
+        "401":
+          description: Пользователь не авторизован
+
+  /comments/{id}:
+    get:
+      tags:
+        - comments
+      summary: Получить список комментариев
+      description: Возвращает список комментариев для фильма с идентификатором `id`.
+      parameters:
+        - name: id
+          in: path
+          description: Уникальный идентификатор фильма
+          required: true
+          schema:
+            type: number
+            example: dmVyLmNvbm5lckBnbWFpbC5
+
+      responses:
+        "200":
+          description: Массив комментариев
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/comment"
+
+        "400":
+          description: Ошибка запроса
+
+    post:
+      tags:
+        - comments
+      summary: Добавить новый комментарий
+      description: Добавляет новый комментарий для фильма с идентификатором `id`.
+      parameters:
+        - name: X-Token
+          in: header
+          description: Авторизационный токен пользователя
+          required: true
+          schema:
+            type: string
+            example: mVyLmNvbm5lckBnbWFpbC5j
+        - name: id
+          in: path
+          description: Уникальный идентификатор фильма
+          required: true
+          schema:
+            type: number
+            example: mVyLmNvbm5lckBnbWFpbC5j
+
+      requestBody:
+        description: Объект с новым комментарием
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/commentPost"
+        required: true
+
+      responses:
+        "200":
+          description: Созданный комментарий
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/comment"
+
+        "400":
+          description: Ошибка запроса
+
+        "401":
+          description: Пользователь не авторизован
 
 components:
   schemas:
@@ -196,6 +499,73 @@ components:
     film:
       type: object
       properties:
+        name:
+          type: string
+          example: Операция «Ы» и другие приключения Шурика
+        publicationDate:
+          type: string
+          example: 2020-07-11T14:03:54.345Z
+        genre:
+          type: string
+          example: Comedy
+        previewVideoLink:
+          type: string
+          example: https://some-link
+        user:
+          type: string
+          example: 6329c3d6a04ab1061c6425ea
+        posterImage:
+          type: string
+          example: img/poster.jpg
+        commentAmount:
+          type: number
+          example: 7
+
+    filmEdit:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Операция «Ы» и другие приключения Шурика
+        description:
+          type: string
+          example: Инженер-изобретатель Тимофеев сконструировал машину времени, которая соединила его квартиру с далеким шестнадцатым веком - точнее, с палатами государя Ивана Грозного. Туда-то и попадают тезка царя пенсионер-общественник Иван Васильевич Бунша и квартирный вор Жорж Милославский. На их место в двадцатом веке <переселяется> великий государь. Поломка машины времени приводит ко множеству неожиданных и забавных событий...
+        genre:
+          type: string
+          example: Comedy
+        released:
+          type: number
+          example: 2019
+        previewVideoLink:
+          type: string
+          example: https://some-link
+        videoLink:
+          type: string
+          example: https://some-link
+        actors:
+          type: array
+          items:
+            type: string
+            example: Toyama Haruko
+        producer:
+          type: string
+          example: Shimura Takashi
+        runTime:
+          type: number
+          example: 99
+        posterImage:
+          type: string
+          example: img/poster.jpg
+        backgroundImage:
+          type: string
+          example: img/bg.jpg
+        color:
+          type: string
+          example: black
+
+    filmDetails:
+      type: object
+      properties:
         id:
           type: string
           example: fs7adf65a76fsafsd67f5
@@ -205,47 +575,69 @@ components:
         description:
           type: string
           example: Инженер-изобретатель Тимофеев сконструировал машину времени, которая соединила его квартиру с далеким шестнадцатым веком - точнее, с палатами государя Ивана Грозного. Туда-то и попадают тезка царя пенсионер-общественник Иван Васильевич Бунша и квартирный вор Жорж Милославский. На их место в двадцатом веке <переселяется> великий государь. Поломка машины времени приводит ко множеству неожиданных и забавных событий...
-        posterImage:
+        publicationDate:
           type: string
-          example: img/the-grand-budapest-hotel-poster.jpg
-        previewImage:
-          type: string
-          example: img/the-grand-budapest-hotel.jpg
-        backgroundImage:
-          type: string
-          example: img/the-grand-budapest-hotel-bg.jpg
-        backgroundColor:
-          type: string
-          example: "#ffffff"
-        videoLink:
-          type: string
-          example: https://some-link
-        previewVideoLink:
-          type: string
-          example: https://some-link
-        rating:
-          type: number
-          example: 8.9
-        scoresCount:
-          type: number
-          example: 240
-        director:
-          type: string
-          example: Wes Anderson
-        starring:
-          type: array
-          items:
-            type: string
-            example: Bill Murray
-        runTime:
-          type: number
-          example: 99
+          example: 2020-07-11T14:03:54.345Z
         genre:
           type: string
           example: Comedy
         released:
           type: number
-          example: 2014
-        isFavorite:
-          type: boolean
-          example: false
+          example: 2019
+        rating:
+          type: number
+          example: 8.9
+        previewVideoLink:
+          type: string
+          example: https://some-link
+        videoLink:
+          type: string
+          example: https://some-link
+        actors:
+          type: array
+          items:
+            type: string
+            example: Toyama Haruko
+        producer:
+          type: string
+          example: Shimura Takashi
+        runTime:
+          type: number
+          example: 99
+        commentAmount:
+          type: number
+          example: 7
+        user:
+          type: string
+          example: 6329c3d6a04ab1061c6425ea
+        posterImage:
+          type: string
+          example: img/poster.jpg
+        backgroundImage:
+          type: string
+          example: img/bg.jpg
+        color:
+          type: string
+          example: black
+
+    comment:
+      type: object
+      properties:
+        text:
+          type: string
+        rating:
+          type: number
+        released:
+          type: string
+        author:
+          type: string
+
+    commentPost:
+      type: object
+      properties:
+        text:
+          type: string
+        rating:
+          type: number
+        released:
+          type: string
