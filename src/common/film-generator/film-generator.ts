@@ -9,7 +9,6 @@ const RATING_DECIMAL = 1;
 const MIN_RUN_TIME = 80;
 const MAX_RUN_TIME = 150;
 const MAX_AMOUNT_COMMENT = 30;
-const colors = ['red', 'blue', 'yellow', 'green', 'black', 'white'];
 
 export default class FilmGenerator implements FilmGeneratorInterface {
   constructor(private readonly mockData: MockData) { }
@@ -18,23 +17,22 @@ export default class FilmGenerator implements FilmGeneratorInterface {
     const name = getRandomItem<string>(this.mockData.names);
     const description = getRandomItem<string>(this.mockData.descriptions);
     const publicationDate = dayjs().toString();
-    const genre = getRandomItem(this.mockData.genres);
+    const genre = getRandomItem<string>(this.mockData.genres);
     const released = dayjs().subtract(generateRandomValue(0, OLD_YEAR), 'year').format('YYYY');
     const rating = generateRandomValue(0, MAX_RATING, RATING_DECIMAL);
-    const previewVideoLink = getRandomItems(this.mockData.previewVideoLinks);
-    const videoLink = getRandomItems(this.mockData.videoLinks);
-    const actors = getRandomItems(this.mockData.actors);
-    const producer = getRandomItem(this.mockData.producers);
+    const previewVideoLink = getRandomItem<string>(this.mockData.previewVideoLinks);
+    const videoLink = getRandomItem<string>(this.mockData.videoLinks);
+    const actors = getRandomItems<string>(this.mockData.actors).join(',');
+    const producer = getRandomItem<string>(this.mockData.producers);
     const runTime = generateRandomValue(MIN_RUN_TIME, MAX_RUN_TIME);
     const commentAmount = generateRandomValue(0, MAX_AMOUNT_COMMENT);
-    const posterImage = getRandomItems(this.mockData.posterImages);
-    const backgroundImage = getRandomItems(this.mockData.backgroundImages);
-    const color = getRandomItem(colors);
+    const posterImage = getRandomItem<string>(this.mockData.posterImages);
+    const backgroundImage = getRandomItem<string>(this.mockData.backgroundImages);
+    const color = getRandomItem<string>(this.mockData.colors);
 
-    const nameUser = getRandomItem(this.mockData.actors);
+    const user = getRandomItem<string>(this.mockData.actors).split(' ')[0];
     const email = getRandomItem<string>(this.mockData.email);
-    const avatarPath = getRandomItems(this.mockData.posterImages);
-    const userId = [nameUser, email, avatarPath].join('\t');
+    const avatarPath = getRandomItem<string>(this.mockData.avatars);
 
     return [
       name,
@@ -49,10 +47,12 @@ export default class FilmGenerator implements FilmGeneratorInterface {
       producer,
       runTime,
       commentAmount,
-      userId,
       posterImage,
       backgroundImage,
-      color
+      color,
+      user,
+      email,
+      avatarPath
     ].join('\t');
   }
 }

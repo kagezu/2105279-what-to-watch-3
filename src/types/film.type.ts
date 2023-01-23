@@ -1,20 +1,10 @@
-export enum Genre {
-  Comedy = 'comedy',
-  Crime = 'crime',
-  Documentary = 'documentary',
-  Drama = 'drama',
-  Horror = 'horror',
-  Family = 'family',
-  Romance = 'romance',
-  Scifi = 'scifi',
-  Thriller = 'thriller'
-}
+import { User } from './user.type.js';
 
 export type Film = {
   name: string;
   description: string;
   publicationDate: string;
-  genre: Genre;
+  genre: string;
   released: string;
   rating: number;
   previewVideoLink: string;
@@ -23,7 +13,7 @@ export type Film = {
   producer: string;
   runTime: number;
   commentAmount: number;
-  userId: string;
+  user: User;
   posterImage: string;
   backgroundImage: string;
   color: string;

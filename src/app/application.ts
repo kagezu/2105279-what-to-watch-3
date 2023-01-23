@@ -5,11 +5,6 @@ import { ConfigInterface } from '../common/config/config.interface.js';
 import { Component } from '../types/component.types.js';
 import { getURI } from '../utils/db.js';
 import { DatabaseInterface } from '../common/database-client/database.interface.js';
-//
-// import { UserServiceInterface } from '../modules/user/user-service.interface.js';
-// import { userContainer } from '../modules/user/user.container.js';
-// import { applicationContainer } from './application.container.js';
-// import { Container } from 'inversify';
 
 @injectable()
 export default class Application {
@@ -32,23 +27,5 @@ export default class Application {
     );
 
     await this.databaseClient.connect(uri);
-
-    /*
-    const user = {
-      email: 'test09@mail.ts',
-      avatarPath: '1230j.jpg',
-      name: 'two-09',
-      password: '12345'
-    };
-    const mainContainer = Container.merge(
-      applicationContainer,
-      userContainer
-    );
-
-    const userService = mainContainer.get<UserServiceInterface>(Component.UserServiceInterface);
-    await userService.findOrCreate(user, this.config.get('SALT'));
-*/
-
-    await this.databaseClient.disconnect();
   }
 }

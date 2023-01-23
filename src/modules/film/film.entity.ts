@@ -1,5 +1,4 @@
 import { Film } from '../../types/film.type.js';
-import { Genre } from '../../types/film.type.js';
 import typegoose, { getModelForClass, defaultClasses, Ref } from '@typegoose/typegoose';
 import { UserEntity } from '../user/user.entity.js';
 
@@ -68,10 +67,9 @@ export class FilmEntity extends defaultClasses.TimeStamps {
   public publicationDate!: string;
 
   @prop({
-    type: () => String,
-    enum: Genre
+    required: true
   })
-  public genre!: Genre;
+  public genre!: string;
 
   @prop({
     required: true
@@ -130,14 +128,14 @@ export class FilmEntity extends defaultClasses.TimeStamps {
   @prop({
     required: true,
     default: '',
-    // match: [/\.(?:jpg)$/, 'jpg format only']
+    match: [/\.(?:jpg)$/, 'jpg format only']
   })
   public posterImage!: string;
 
   @prop({
-    // required: true,
+    required: true,
     default: '',
-    // match: [/\.(?:jpg)$/, 'jpg format only']
+    match: [/\.(?:jpg)$/, 'jpg format only']
   })
   public backgroundImage!: string;
 
