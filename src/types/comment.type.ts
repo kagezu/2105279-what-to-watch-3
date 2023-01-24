@@ -5,4 +5,5 @@ export type Comment = {
   rating: number;
   released: string;
   author: User;
+  filmId: string;
 }
