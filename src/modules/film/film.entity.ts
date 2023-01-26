@@ -1,18 +1,9 @@
 import typegoose, { getModelForClass, defaultClasses, Ref } from '@typegoose/typegoose';
 import { Genre } from '../../types/genre.type.js';
 import { UserEntity } from '../user/user.entity.js';
+import { FilmOption } from './film.constant.js';
 
 const { prop, modelOptions } = typegoose;
-
-const enum FilmOption {
-  MinLengthName = 2,
-  MaxLengthName = 100,
-  MinLengthDescription = 20,
-  MaxLengthDescription = 1024,
-  MinLengthProducerName = 2,
-  MaxLengthProducerName = 50,
-  DefaultColor = '#000000'
-}
 
 export interface FilmEntity extends defaultClasses.Base { }
 
