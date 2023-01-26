@@ -1,12 +1,9 @@
-import { Comment } from '../../types/comment.type.js';
-import typegoose, { getModelForClass, defaultClasses } from '@typegoose/typegoose';
-import { User } from '../../types/user.type.js';
+import typegoose, { getModelForClass, defaultClasses, Ref } from '@typegoose/typegoose';
+import { UserEntity } from '../user/user.entity.js';
+import { FilmEntity } from '../film/film.entity.js';
+import { CommentOption } from './comment.constant.js';
 
 const { prop, modelOptions } = typegoose;
-enum CommentOption {
-  MinLengthText = 5,
-  MaxLengthText = 1024
-}
 
 export interface CommentEntity extends defaultClasses.Base { }
 
@@ -16,16 +13,6 @@ export interface CommentEntity extends defaultClasses.Base { }
   }
 })
 export class CommentEntity extends defaultClasses.TimeStamps {
-  constructor(data: Comment) {
-    super();
-
-    this.text = data.text;
-    this.rating = data.rating;
-    // this.released = data.released;
-    // this.author = data.author;
-    // this.filmId = data.filmId;
-  }
-
   @prop({
     required: true,
     minlength: [CommentOption.MinLengthText, `Min length for text is ${CommentOption.MinLengthText}`],
@@ -36,17 +23,17 @@ export class CommentEntity extends defaultClasses.TimeStamps {
   @prop({})
   public rating!: number;
 
-  @prop({})
-  public released!: string;
+  @prop({
+    ref: UserEntity,
+    required: true
+  })
+  public author!: Ref<UserEntity>;
 
-  @prop({})
-  public author!: User;
-
-  @prop({})
-  public userId!: string;
-
-  @prop({})
-  public filmId!: string;
+  @prop({
+    ref: FilmEntity,
+    required: true
+  })
+  public film!: Ref<FilmEntity>;
 }
 
 export const commentModel = getModelForClass(CommentEntity);
