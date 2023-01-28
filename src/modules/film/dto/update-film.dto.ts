@@ -14,4 +14,5 @@ export default class UpdateFilmDto {
   posterImage?: string;
   backgroundImage?: string;
   color?: string;
+  rating?: number;
 }

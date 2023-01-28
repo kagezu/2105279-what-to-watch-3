@@ -26,13 +26,10 @@ export default class FilmService implements FilmServiceInterface {
   }
 
   public async updateById(filmId: string, dto: UpdateFilmDto): Promise<DocumentType<FilmEntity> | null> {
-    const result = await this.filmModel
+    return await this.filmModel
       .findByIdAndUpdate(filmId, dto, { new: true })
       .populate('user')
       .exec();
-    this.logger.info(`Update film: ${dto.name}`);
-
-    return result;
   }
 
   public async deleteById(filmId: string): Promise<DocumentType<FilmEntity> | null> {
@@ -77,5 +74,21 @@ export default class FilmService implements FilmServiceInterface {
           commentCount: 1,
         }
       }).exec();
+  }
+
+  public async updateRatingByFilmId(filmId: string, newGrade: number): Promise<number | undefined> {
+    const result = await this.filmModel
+      .findById(filmId)
+      .exec();
+    if (!result) {
+      return;
+    }
+    const newRating = (result.rating * result.commentAmount + newGrade) / (result.commentAmount + 1);
+
+    await this.updateById(filmId, {
+      rating: newRating
+    });
+
+    return newRating;
   }
 }

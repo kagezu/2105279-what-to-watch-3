@@ -29,4 +29,7 @@ export interface FilmServiceInterface {
 
   /** Увеличение счётчика комментариев*/
   incCommentCount(FilmId: string): Promise<DocumentType<FilmEntity> | null>;
+
+  /** Расчетать и обновить рейтинг для определённого фильма*/
+  updateRatingByFilmId(filmId: string, newGrade: number): Promise<number | undefined>;
 }
