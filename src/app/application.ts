@@ -27,5 +27,6 @@ export default class Application {
     );
 
     await this.databaseClient.connect(uri);
+
   }
 }
