@@ -1,7 +1,6 @@
 import { User } from '../../types/user.type.js';
 import typegoose, { getModelForClass, defaultClasses } from '@typegoose/typegoose';
 import { createSHA256 } from '../../utils/common.js';
-// import { FilmEntity } from '../film/film.entity.js';
 
 const { prop, modelOptions } = typegoose;
 enum UserOption {
@@ -47,14 +46,6 @@ export class UserEntity extends defaultClasses.TimeStamps implements User {
 
   @prop({ required: true })
   private password!: string;
-  /*
-    @prop({
-      ref: FilmEntity,
-      required: true,
-      default: []
-    })
-    public favorites!: Ref<FilmEntity>[];
-  */
 
   public setPassword(password: string, salt: string) {
     if (password.length < 6 || password.length > 12) {

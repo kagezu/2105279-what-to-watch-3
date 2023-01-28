@@ -5,7 +5,6 @@ import CreateUserDto from './dto/create-user.dto.js';
 import { UserServiceInterface } from './user-service.interface.js';
 import { LoggerInterface } from '../../common/logger/logger.interface.js';
 import { Component } from '../../types/component.types.js';
-// import { FilmEntity } from '../film/film.entity.js';
 
 @injectable()
 export default class UserService implements UserServiceInterface {
@@ -39,20 +38,4 @@ export default class UserService implements UserServiceInterface {
 
     return this.create(dto, salt);
   }
-  /*
-    public async findFavoriteByEmail(email: string): Promise<DocumentType<FilmEntity>[]> {
-      const [result] = await this.userModel
-        .find({ email })
-        .populate('favorite')
-        .populate('user')
-        .exec();
-      this.logger.info(result as unknown as string);
-      return result.favorites as DocumentType<FilmEntity>[];
-    }
-      public async updateFavoriteByEmail(email: string, filmId: string, status: boolean): Promise<DocumentType<FilmEntity>[]> {
-        const favorites = await this.userModel
-          .find({ email })
-          .exec();
-      }
-    */
 }
