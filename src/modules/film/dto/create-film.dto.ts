@@ -11,7 +11,6 @@ export default class CreateFilmDto {
   actors!: string[];
   producer!: string;
   runTime!: number;
-  commentAmount!: number;
   user!: string;
   posterImage!: string;
   backgroundImage!: string;
