@@ -39,3 +39,22 @@ export default class UserService implements UserServiceInterface {
     return this.create(dto, salt);
   }
 }
+
+/*
+  public async findFavorite(): Promise < DocumentType < FilmEntity > [] > {////////////////////////////////////////
+  return this.filmModel
+    .find()
+    .populate('user')
+    .exec();
+}
+
+  public async updateFavorite(filmId: string, status: boolean): Promise < DocumentType < FilmEntity > [] > {
+
+}
+
+
+  /** Получить список фильмов «К просмотру»*/
+// findFavorite(): Promise<DocumentType<FilmEntity>[]>;
+
+/** Добавить/удалить фильм из списка «К просмотру»*/
+// updateFavorite(filmId: string, status: boolean): Promise<DocumentType<FilmEntity>[]>;
