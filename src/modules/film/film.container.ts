@@ -7,7 +7,7 @@ import { Component } from '../../types/component.types.js';
 
 const filmContainer = new Container();
 
-filmContainer.bind<FilmServiceInterface>(Component.UserServiceInterface).to(FilmService).inSingletonScope();
+filmContainer.bind<FilmServiceInterface>(Component.FilmServiceInterface).to(FilmService).inSingletonScope();
 filmContainer.bind<types.ModelType<FilmEntity>>(Component.FilmModel).toConstantValue(FilmModel);
 
 export { filmContainer };
