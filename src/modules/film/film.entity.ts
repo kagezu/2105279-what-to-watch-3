@@ -1,18 +1,9 @@
-import { Film } from '../../types/film.type.js';
 import typegoose, { getModelForClass, defaultClasses, Ref } from '@typegoose/typegoose';
+import { Genre } from '../../types/genre.type.js';
 import { UserEntity } from '../user/user.entity.js';
+import { FilmOption } from './film.constant.js';
 
 const { prop, modelOptions } = typegoose;
-
-const enum FilmOption {
-  MinLengthName = 2,
-  MaxLengthName = 100,
-  MinLengthDescription = 20,
-  MaxLengthDescription = 1024,
-  MinLengthProducerName = 2,
-  MaxLengthProducerName = 50,
-  DefaultColor = '#000000'
-}
 
 export interface FilmEntity extends defaultClasses.Base { }
 
@@ -22,26 +13,6 @@ export interface FilmEntity extends defaultClasses.Base { }
   }
 })
 export class FilmEntity extends defaultClasses.TimeStamps {
-  constructor(data: Film) {
-    super();
-
-    this.name = data.name;
-    this.description = data.description;
-    this.publicationDate = data.publicationDate;
-    this.genre = data.genre;
-    this.released = data.released;
-    this.rating = data.rating;
-    this.previewVideoLink = data.previewVideoLink;
-    this.videoLink = data.videoLink;
-    this.actors = data.actors;
-    this.producer = data.producer;
-    this.runTime = data.runTime;
-    this.commentAmount = data.commentAmount;
-    this.posterImage = data.posterImage;
-    this.backgroundImage = data.backgroundImage;
-    this.color = data.color;
-  }
-
   @prop({
     trim: true,
     required: true,
@@ -69,7 +40,7 @@ export class FilmEntity extends defaultClasses.TimeStamps {
   @prop({
     required: true
   })
-  public genre!: string;
+  public genre!: Genre;
 
   @prop({
     required: true
@@ -123,7 +94,7 @@ export class FilmEntity extends defaultClasses.TimeStamps {
     ref: UserEntity,
     required: true
   })
-  public userId!: Ref<UserEntity>;
+  public user!: Ref<UserEntity>;
 
   @prop({
     required: true,
