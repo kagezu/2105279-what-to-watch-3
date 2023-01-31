@@ -39,7 +39,7 @@ export default class CommentService implements CommentServiceInterface {
       .find({ film: filmId })
       .sort({ createdAt: SortType.Down })
       .limit(limit)
-      .populate('user')
+      .populate('author')
       .exec();
   }
 }

@@ -22,33 +22,34 @@ export default class CommentController extends Controller {
 
     this.logger.info('Register routes for CommentController…');
 
-    this.addRoute({ path: '/:id', method: HttpMethod.Get, handler: this.find });
-    this.addRoute({ path: '/:id', method: HttpMethod.Post, handler: this.create });
+    this.addRoute({ path: '/', method: HttpMethod.Get, handler: this.find });
+    this.addRoute({ path: '/', method: HttpMethod.Post, handler: this.create });
   }
 
   public async find(_req: Request, res: Response): Promise<void> {
 
-    const comments = await this.commentService.findByFilmId('1'); // temp
+    const comments = await this.commentService.findByFilmId('63d8c73560a8064cd4514e23'); // temp
     if (comments) {
       this.send(res, StatusCodes.OK, comments);
-    } else {
-      this.noContent(res);
+      return;
     }
+
+    this.noContent(res);
   }
 
   public async create(
     req: Request<Record<string, unknown>, Record<string, unknown>, CreateCommentDto>,
     res: Response): Promise<void> {
 
-    const existFilm = await this.filmService.findById('1'); // temp
+    const existFilm = await this.filmService.findById('63d8c73560a8064cd4514e23'); // temp
 
     if (!existFilm) {
-      const errorMessage = `Film with id «${1}» not exists.`; // temp
+      const errorMessage = `Film with id «${'63d8c73560a8064cd4514e23'}» not exists.`; // temp
       this.send(res, StatusCodes.BAD_REQUEST, { error: errorMessage });
       return this.logger.error(errorMessage);
     }
 
-    const result = await this.commentService.create('1', req.body);
+    const result = await this.commentService.create('63d8c73560a8064cd4514e23', req.body);
     this.send(
       res,
       StatusCodes.CREATED,
