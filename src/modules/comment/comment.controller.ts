@@ -10,6 +10,7 @@ import CreateCommentDto from './dto/create-comment.dto.js';
 import CommentResponse from './response/comment.response.js';
 import { fillDTO } from '../../utils/common.js';
 import { FilmServiceInterface } from '../film/film-service.interface.js';
+import HttpError from '../../common/errors/http-error.js';
 
 @injectable()
 export default class CommentController extends Controller {
@@ -44,9 +45,11 @@ export default class CommentController extends Controller {
     const existFilm = await this.filmService.findById('63d8c73560a8064cd4514e23'); // temp
 
     if (!existFilm) {
-      const errorMessage = `Film with id «${'63d8c73560a8064cd4514e23'}» not exists.`; // temp
-      this.send(res, StatusCodes.BAD_REQUEST, { error: errorMessage });
-      return this.logger.error(errorMessage);
+      throw new HttpError(
+        StatusCodes.UNPROCESSABLE_ENTITY,
+        `Film with id «${'63d8c73560a8064cd4514e23'}» not exists.`, // temp
+        'CommentController'
+      );
     }
 
     const result = await this.commentService.create('63d8c73560a8064cd4514e23', req.body);
