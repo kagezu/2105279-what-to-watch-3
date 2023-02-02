@@ -9,7 +9,7 @@ import UpdateFilmDto from './dto/update-film.dto.js';
 import { DEFAULT_FILM_COUNT } from './film.constant.js';
 import { Genre } from '../../types/genre.type.js';
 
-const PROMO_ID = 'testId';
+const PROMO_ID = '63d8c73560a8064cd4514e23';
 
 @injectable()
 export default class FilmService implements FilmServiceInterface {
@@ -41,6 +41,7 @@ export default class FilmService implements FilmServiceInterface {
   public async find(): Promise<DocumentType<FilmEntity>[]> {
     return this.filmModel
       .find()
+      .limit(10)
       .populate('user')
       .exec();
   }
