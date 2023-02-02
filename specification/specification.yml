@@ -115,7 +115,7 @@ paths:
         "403":
           description: Выход не выполнен
 
-  /promo:
+  /films/promo:
     get:
       tags:
         - films
@@ -269,7 +269,7 @@ paths:
         "401":
           description: Пользователь не авторизован
 
-  /genre/{genre}:
+  /films/genre/{genre}:
     get:
       tags:
         - films
@@ -425,7 +425,7 @@ paths:
         required: true
 
       responses:
-        "200":
+        "201":
           description: Созданный комментарий
           content:
             application/json:

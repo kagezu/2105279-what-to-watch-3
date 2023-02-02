@@ -4,10 +4,13 @@ import { CommentEntity, commentModel } from './comment.entity.js';
 import { CommentServiceInterface } from './comment-service.interface.js';
 import CommentService from './comment.service.js';
 import { Component } from '../../types/component.types.js';
+import { ControllerInterface } from '../../common/controller/controller.interface.js';
+import CommentController from './comment.controller.js';
 
-const CommentContainer = new Container();
+const commentContainer = new Container();
 
-CommentContainer.bind<CommentServiceInterface>(Component.CommentServiceInterface).to(CommentService).inSingletonScope();
-CommentContainer.bind<types.ModelType<CommentEntity>>(Component.CommentModel).toConstantValue(commentModel);
+commentContainer.bind<CommentServiceInterface>(Component.CommentServiceInterface).to(CommentService).inSingletonScope();
+commentContainer.bind<types.ModelType<CommentEntity>>(Component.CommentModel).toConstantValue(commentModel);
+commentContainer.bind<ControllerInterface>(Component.CommentController).to(CommentController).inSingletonScope();
 
-export { CommentContainer };
+export { commentContainer };

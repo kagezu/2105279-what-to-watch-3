@@ -7,9 +7,8 @@ import { LoggerInterface } from '../../common/logger/logger.interface.js';
 import { Component } from '../../types/component.types.js';
 import UpdateFilmDto from './dto/update-film.dto.js';
 import { DEFAULT_FILM_COUNT } from './film.constant.js';
-import { Genre } from '../../types/genre.type.js';
 
-const PROMO_ID = 'testId';
+const PROMO_ID = '63dbb689cba5369b4ce303b7';
 
 @injectable()
 export default class FilmService implements FilmServiceInterface {
@@ -25,7 +24,7 @@ export default class FilmService implements FilmServiceInterface {
     return result;
   }
 
-  public async updateById(filmId: string, dto: UpdateFilmDto): Promise<DocumentType<FilmEntity> | null> {
+  public async update(filmId: string, dto: UpdateFilmDto): Promise<DocumentType<FilmEntity> | null> {
     return await this.filmModel
       .findByIdAndUpdate(filmId, dto, { new: true })
       .populate('user')
@@ -41,11 +40,12 @@ export default class FilmService implements FilmServiceInterface {
   public async find(): Promise<DocumentType<FilmEntity>[]> {
     return this.filmModel
       .find()
+      .limit(10)
       .populate('user')
       .exec();
   }
 
-  public async findByGenre(genre: Genre, count?: number): Promise<DocumentType<FilmEntity>[]> {
+  public async findByGenre(genre: string, count?: number): Promise<DocumentType<FilmEntity>[]> {
     const limit = count ?? DEFAULT_FILM_COUNT;
     return this.filmModel
       .find({ genre }, {}, { limit })
@@ -85,7 +85,7 @@ export default class FilmService implements FilmServiceInterface {
     }
     const newRating = (result.rating * result.commentAmount + newGrade) / (result.commentAmount + 1);
 
-    await this.updateById(filmId, {
+    await this.update(filmId, {
       rating: newRating
     });
 
