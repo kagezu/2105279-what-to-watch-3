@@ -187,7 +187,7 @@ paths:
         "401":
           description: Пользователь не авторизован
 
-  /films/id/{id}:
+  /films/{id}:
     get:
       tags:
         - films

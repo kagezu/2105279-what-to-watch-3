@@ -32,8 +32,10 @@ export default class FilmController extends Controller {
     this.addRoute({ path: '/', method: HttpMethod.Post, handler: this.create });
     this.addRoute({ path: '/', method: HttpMethod.Get, handler: this.find });
     this.addRoute({ path: '/promo', method: HttpMethod.Get, handler: this.promo });
-    this.addRoute({ path: '/id/{:id}', method: HttpMethod.Get, handler: this.findById });
-    // this.addRoute({ path: '/', method: HttpMethod.Post, handler: () => null });
+    this.addRoute({ path: '/:id', method: HttpMethod.Get, handler: this.findById });
+    this.addRoute({ path: '/:id', method: HttpMethod.Patch, handler: this.update });
+    this.addRoute({ path: '/:id', method: HttpMethod.Delete, handler: this.delete });
+    this.addRoute({ path: '/genre/:genre', method: HttpMethod.Get, handler: this.findByGenre });
     // this.addRoute({ path: '/', method: HttpMethod.Post, handler: () => null });
     // this.addRoute({ path: '/', method: HttpMethod.Post, handler: () => null });
     // this.addRoute({ path: '/', method: HttpMethod.Post, handler: () => null });
@@ -50,13 +52,50 @@ export default class FilmController extends Controller {
       this.send(
         res,
         StatusCodes.CREATED,
-        fillDTO(FilmResponse, {
-          ...result,
+        {
+          ...fillDTO(FilmResponse, result),
           user: fillDTO(UserResponse, user)
-        })
+        }
       );
     }
   }
+
+  public async update(req: Request, res: Response): Promise<void> {
+    const result = await this.filmService.update(req.params.id, req.body);
+
+    if (!result) {
+      throw new HttpError(
+        StatusCodes.NOT_FOUND,
+        'Film not exists.',
+        'UserController'
+      );
+    }
+
+    this.send(
+      res,
+      StatusCodes.CREATED,
+      this.filmFillDTO(result)
+    );
+  }
+
+  public async delete(req: Request, res: Response): Promise<void> {
+    const result = await this.filmService.deleteById(req.params.id);
+
+    if (!result) {
+      throw new HttpError(
+        StatusCodes.NOT_FOUND,
+        'Film not exists.',
+        'UserController'
+      );
+    }
+
+    this.send(
+      res,
+      StatusCodes.OK,
+      this.filmFillDTO(result)
+    );
+  }
+
 
   public async find(_req: Request, res: Response): Promise<void> {
     const result = await this.filmService.find();
@@ -79,20 +118,46 @@ export default class FilmController extends Controller {
       );
     }
 
-    const response = this.filmFillDTO(result);
     this.send(
       res,
       StatusCodes.OK,
-      response
+      this.filmFillDTO(result)
     );
   }
 
-  public async findById(_req: Request, res: Response): Promise<void> {
-    const response = await this.filmService.findById('63d8c73560a8064cd4514e23');
+  public async findById(req: Request, res: Response): Promise<void> {
+    const result = await this.filmService.findById(req.params.id);
+
+    if (!result) {
+      throw new HttpError(
+        StatusCodes.NOT_FOUND,
+        'Film not exists.',
+        'UserController'
+      );
+    }
+
     this.send(
       res,
       StatusCodes.OK,
-      response
+      this.filmFillDTO(result)
+    );
+  }
+
+  public async findByGenre(req: Request, res: Response): Promise<void> {
+    const result = await this.filmService.findByGenre(req.params.genre);
+
+    if (!result) {
+      throw new HttpError(
+        StatusCodes.NOT_FOUND,
+        `Film with genre ${req.params.genre} not exists.`,
+        'UserController'
+      );
+    }
+
+    this.send(
+      res,
+      StatusCodes.OK,
+      result.map(this.filmFillDTO)
     );
   }
 
@@ -100,7 +165,7 @@ export default class FilmController extends Controller {
     const response = fillDTO(FilmResponse, film);
     return ({
       ...response,
-      user: fillDTO(UserResponse, response.user)
+      user: fillDTO(UserResponse, film.user)
     });
   }
 }
