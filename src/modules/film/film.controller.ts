@@ -10,21 +10,20 @@ import HttpError from '../../common/errors/http-error.js';
 import { StatusCodes } from 'http-status-codes';
 import { fillDTO } from '../../utils/common.js';
 import FilmResponse from './response/film.response.js';
-// import { ConfigInterface } from '../../common/config/config.interface.js';
-// import UpdateFilmDto from './dto/update-film.dto.js';
 import { UserServiceInterface } from '../user/user-service.interface.js';
 import UserResponse from '../user/response/user.response.js';
 import { FilmEntity } from './film.entity.js';
 import { DocumentType } from '@typegoose/typegoose';
 import { BeAnObject } from '@typegoose/typegoose/lib/types.js';
+import { ConfigInterface } from '../../common/config/config.interface.js';
 
 @injectable()
 export default class FilmController extends Controller {
   constructor(
     @inject(Component.LoggerInterface) logger: LoggerInterface,
     @inject(Component.UserServiceInterface) private readonly userService: UserServiceInterface,
-    @inject(Component.FilmServiceInterface) private readonly filmService: FilmServiceInterface
-    // @inject(Component.ConfigInterface) private readonly configService: ConfigInterface,
+    @inject(Component.FilmServiceInterface) private readonly filmService: FilmServiceInterface,
+    @inject(Component.ConfigInterface) private readonly configService: ConfigInterface,
   ) {
     super(logger);
     this.logger.info('Register routes for UserController…');
@@ -36,9 +35,6 @@ export default class FilmController extends Controller {
     this.addRoute({ path: '/:id', method: HttpMethod.Patch, handler: this.update });
     this.addRoute({ path: '/:id', method: HttpMethod.Delete, handler: this.delete });
     this.addRoute({ path: '/genre/:genre', method: HttpMethod.Get, handler: this.findByGenre });
-    // this.addRoute({ path: '/', method: HttpMethod.Post, handler: () => null });
-    // this.addRoute({ path: '/', method: HttpMethod.Post, handler: () => null });
-    // this.addRoute({ path: '/', method: HttpMethod.Post, handler: () => null });
   }
 
   public async create(

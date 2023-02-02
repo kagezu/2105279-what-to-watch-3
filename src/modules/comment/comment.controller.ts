@@ -29,7 +29,7 @@ export default class CommentController extends Controller {
 
   public async find(_req: Request, res: Response): Promise<void> {
 
-    const comments = await this.commentService.findByFilmId('63d8c73560a8064cd4514e23'); // temp
+    const comments = await this.commentService.findByFilmId('63d8c73560a8064cd4514e23');
     if (comments) {
       this.send(res, StatusCodes.OK, comments);
       return;
@@ -42,12 +42,12 @@ export default class CommentController extends Controller {
     req: Request<Record<string, unknown>, Record<string, unknown>, CreateCommentDto>,
     res: Response): Promise<void> {
 
-    const existFilm = await this.filmService.findById('63d8c73560a8064cd4514e23'); // temp
+    const existFilm = await this.filmService.findById('63d8c73560a8064cd4514e23');
 
     if (!existFilm) {
       throw new HttpError(
         StatusCodes.UNPROCESSABLE_ENTITY,
-        `Film with id «${'63d8c73560a8064cd4514e23'}» not exists.`, // temp
+        `Film with id «${'63d8c73560a8064cd4514e23'}» not exists.`,
         'CommentController'
       );
     }
