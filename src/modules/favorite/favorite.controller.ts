@@ -10,6 +10,8 @@ import { FilmServiceInterface } from '../film/film-service.interface.js';
 import FilmResponse from '../film/response/film.response.js';
 // import { ConfigInterface } from '../../common/config/config.interface.js';
 
+const DEFAULT_USER_ID = '63dbb223cba5369b4ce303ae';
+
 @injectable()
 export default class FavoriteController extends Controller {
   constructor(
@@ -28,7 +30,7 @@ export default class FavoriteController extends Controller {
 
   public async create(req: Request, res: Response,): Promise<void> {
     await this.favoriteService.create({
-      user: '',
+      user: DEFAULT_USER_ID,
       film: req.params.id
     });
 
@@ -36,9 +38,9 @@ export default class FavoriteController extends Controller {
     this.ok(res, fillDTO(FilmResponse, result));
   }
 
-  public async delete(req: Request, res: Response,): Promise<void> {
+  public async delete(req: Request, res: Response): Promise<void> {
     await this.favoriteService.delete({
-      user: '',
+      user: DEFAULT_USER_ID,
       film: req.params.id
     });
 
@@ -46,10 +48,10 @@ export default class FavoriteController extends Controller {
     this.ok(res, fillDTO(FilmResponse, result));
   }
 
-  public async index(_req: Request, res: Response,): Promise<void> {
-    await this.favoriteService;
+  public async index(_req: Request, res: Response): Promise<void> {
+    const result = await this.favoriteService.index(DEFAULT_USER_ID);
 
-    // this.ok(res, fillDTO(FilmResponse, result));
+    this.ok(res, result.map((value) => fillDTO(FilmResponse, value.film)));
   }
 }
 

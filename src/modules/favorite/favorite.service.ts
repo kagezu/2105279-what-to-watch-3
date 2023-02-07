@@ -1,5 +1,5 @@
 import { inject, injectable } from 'inversify';
-import { types } from '@typegoose/typegoose';
+import { DocumentType, types } from '@typegoose/typegoose';
 import { LoggerInterface } from '../../common/logger/logger.interface.js';
 import { Component } from '../../types/component.types.js';
 import { FavoriteServiceInterface } from './favorite-service.interface.js';
@@ -11,7 +11,7 @@ import DeleteFavoriteDto from './dto/delete-favorite.dto.js';
 export default class FavoriteService implements FavoriteServiceInterface {
   constructor(
     @inject(Component.LoggerInterface) private logger: LoggerInterface,
-    @inject(Component.UserModel) private readonly favoriteModel: types.ModelType<FavoriteEntity>
+    @inject(Component.FavoriteModel) private readonly favoriteModel: types.ModelType<FavoriteEntity>
   ) { }
 
   public async create(dto: CreateFavoriteDto): Promise<void> {
@@ -24,4 +24,12 @@ export default class FavoriteService implements FavoriteServiceInterface {
     this.logger.info(`Deleted film from favorite: ${dto.film} for user: ${dto.user}`);
   }
 
+  public async index(user: string): Promise<DocumentType<FavoriteEntity>[]> {
+    return this.favoriteModel
+      .find({ user })
+      .limit(10)
+      .populate('film')
+      .populate('user')
+      .exec();
+  }
 }
