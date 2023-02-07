@@ -15,6 +15,7 @@ import UserResponse from '../user/response/user.response.js';
 import { FilmEntity } from './film.entity.js';
 import { DocumentType } from '@typegoose/typegoose';
 import { BeAnObject } from '@typegoose/typegoose/lib/types.js';
+import { CommentServiceInterface } from '../comment/comment-service.interface.js';
 
 @injectable()
 export default class FilmController extends Controller {
@@ -22,6 +23,7 @@ export default class FilmController extends Controller {
     @inject(Component.LoggerInterface) logger: LoggerInterface,
     @inject(Component.UserServiceInterface) private readonly userService: UserServiceInterface,
     @inject(Component.FilmServiceInterface) private readonly filmService: FilmServiceInterface,
+    @inject(Component.CommentServiceInterface) private readonly commentService: CommentServiceInterface,
   ) {
     super(logger);
     this.logger.info('Register routes for FilmController…');
@@ -73,6 +75,7 @@ export default class FilmController extends Controller {
   }
 
   public async delete(req: Request, res: Response): Promise<void> {
+    await this.commentService.delete(req.params.id);
     const result = await this.filmService.delete(req.params.id);
 
     if (!result) {

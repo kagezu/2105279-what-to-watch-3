@@ -30,6 +30,7 @@ export default class FilmService implements FilmServiceInterface {
   }
 
   public async delete(filmId: string): Promise<DocumentType<FilmEntity> | null> {
+
     return this.filmModel
       .findByIdAndDelete(filmId)
       .exec();

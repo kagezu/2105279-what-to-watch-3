@@ -7,8 +7,8 @@ export interface CommentServiceInterface {
   create(filmId: string, dto: CreateCommentDto): Promise<DocumentType<CommentEntity>>;
 
   /** Удаление комментариев к определённому фильму*/
-  deleteByFilmId(filmId: string): Promise<number>;
+  delete(filmId: string): Promise<number>;
 
   /** Получить список комментариев для определённого фильма*/
-  findByFilmId(filmId: string, count?: number): Promise<DocumentType<CommentEntity>[] | null>;
+  index(filmId: string, count?: number): Promise<DocumentType<CommentEntity>[] | null>;
 }

@@ -6,7 +6,6 @@ import { LoggerInterface } from '../../common/logger/logger.interface.js';
 import { HttpMethod } from '../../types/http-method.enum.js';
 import { CommentServiceInterface } from './comment-service.interface.js';
 import { StatusCodes } from 'http-status-codes';
-import CreateCommentDto from './dto/create-comment.dto.js';
 import CommentResponse from './response/comment.response.js';
 import { fillDTO } from '../../utils/common.js';
 import { FilmServiceInterface } from '../film/film-service.interface.js';
@@ -23,36 +22,34 @@ export default class CommentController extends Controller {
 
     this.logger.info('Register routes for CommentController…');
 
-    this.addRoute({ path: '/', method: HttpMethod.Get, handler: this.find });
-    this.addRoute({ path: '/', method: HttpMethod.Post, handler: this.create });
+    this.addRoute({ path: '/:id', method: HttpMethod.Get, handler: this.index });
+    this.addRoute({ path: '/:id', method: HttpMethod.Post, handler: this.create });
   }
 
-  public async find(_req: Request, res: Response): Promise<void> {
+  public async index(req: Request, res: Response): Promise<void> {
 
-    const comments = await this.commentService.findByFilmId('63d8c73560a8064cd4514e23');
+    const comments = await this.commentService.index(req.params.id);
     if (comments) {
-      this.send(res, StatusCodes.OK, comments);
+      this.ok(res, comments);
       return;
     }
 
     this.noContent(res);
   }
 
-  public async create(
-    req: Request<Record<string, unknown>, Record<string, unknown>, CreateCommentDto>,
-    res: Response): Promise<void> {
+  public async create(req: Request, res: Response): Promise<void> {
 
-    const existFilm = await this.filmService.show('63d8c73560a8064cd4514e23');
+    const existFilm = await this.filmService.show(req.params.id);
 
     if (!existFilm) {
       throw new HttpError(
         StatusCodes.UNPROCESSABLE_ENTITY,
-        `Film with id «${'63d8c73560a8064cd4514e23'}» not exists.`,
+        `Film with id «${req.params.id}» not exists.`,
         'CommentController'
       );
     }
 
-    const result = await this.commentService.create('63d8c73560a8064cd4514e23', req.body);
+    const result = await this.commentService.create(req.params.id, req.body);
     this.send(
       res,
       StatusCodes.CREATED,
