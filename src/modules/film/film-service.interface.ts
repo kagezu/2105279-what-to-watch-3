@@ -12,19 +12,19 @@ export interface FilmServiceInterface {
   update(filmId: string, dto: UpdateFilmDto): Promise<DocumentType<FilmEntity> | null>;
 
   /** Удаление карточки фильма*/
-  deleteById(filmId: string): Promise<DocumentType<FilmEntity> | null>;
+  delete(filmId: string): Promise<DocumentType<FilmEntity> | null>;
 
   /** Получение списка фильмов*/
-  find(): Promise<DocumentType<FilmEntity>[]>;
+  index(): Promise<DocumentType<FilmEntity>[]>;
 
   /** Получение списка фильмов определённого жанра*/
   findByGenre(genre: string, count?: number): Promise<DocumentType<FilmEntity>[]>;
 
   /** Получение детальной информации по фильму*/
-  findById(filmId: string): Promise<DocumentType<FilmEntity> | null>;
+  show(filmId: string): Promise<DocumentType<FilmEntity> | null>;
 
   /** Получение промо - фильма*/
-  findPromo(): Promise<DocumentType<FilmEntity> | null>;
+  promo(): Promise<DocumentType<FilmEntity> | null>;
 
   /** Увеличение счётчика комментариев*/
   incCommentCount(FilmId: string): Promise<DocumentType<FilmEntity> | null>;

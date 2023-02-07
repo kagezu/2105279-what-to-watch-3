@@ -15,7 +15,6 @@ import UserResponse from '../user/response/user.response.js';
 import { FilmEntity } from './film.entity.js';
 import { DocumentType } from '@typegoose/typegoose';
 import { BeAnObject } from '@typegoose/typegoose/lib/types.js';
-import { ConfigInterface } from '../../common/config/config.interface.js';
 
 @injectable()
 export default class FilmController extends Controller {
@@ -23,15 +22,14 @@ export default class FilmController extends Controller {
     @inject(Component.LoggerInterface) logger: LoggerInterface,
     @inject(Component.UserServiceInterface) private readonly userService: UserServiceInterface,
     @inject(Component.FilmServiceInterface) private readonly filmService: FilmServiceInterface,
-    @inject(Component.ConfigInterface) private readonly configService: ConfigInterface,
   ) {
     super(logger);
-    this.logger.info('Register routes for UserController…');
+    this.logger.info('Register routes for FilmController…');
 
     this.addRoute({ path: '/', method: HttpMethod.Post, handler: this.create });
-    this.addRoute({ path: '/', method: HttpMethod.Get, handler: this.find });
+    this.addRoute({ path: '/', method: HttpMethod.Get, handler: this.index });
     this.addRoute({ path: '/promo', method: HttpMethod.Get, handler: this.promo });
-    this.addRoute({ path: '/:id', method: HttpMethod.Get, handler: this.findById });
+    this.addRoute({ path: '/:id', method: HttpMethod.Get, handler: this.show });
     this.addRoute({ path: '/:id', method: HttpMethod.Patch, handler: this.update });
     this.addRoute({ path: '/:id', method: HttpMethod.Delete, handler: this.delete });
     this.addRoute({ path: '/genre/:genre', method: HttpMethod.Get, handler: this.findByGenre });
@@ -75,7 +73,7 @@ export default class FilmController extends Controller {
   }
 
   public async delete(req: Request, res: Response): Promise<void> {
-    const result = await this.filmService.deleteById(req.params.id);
+    const result = await this.filmService.delete(req.params.id);
 
     if (!result) {
       throw new HttpError(
@@ -93,8 +91,8 @@ export default class FilmController extends Controller {
   }
 
 
-  public async find(_req: Request, res: Response): Promise<void> {
-    const result = await this.filmService.find();
+  public async index(_req: Request, res: Response): Promise<void> {
+    const result = await this.filmService.index();
     const response = result.map(this.filmFillDTO);
     this.send(
       res,
@@ -104,7 +102,7 @@ export default class FilmController extends Controller {
   }
 
   public async promo(_req: Request, res: Response): Promise<void> {
-    const result = await this.filmService.findPromo();
+    const result = await this.filmService.promo();
 
     if (!result) {
       throw new HttpError(
@@ -121,8 +119,8 @@ export default class FilmController extends Controller {
     );
   }
 
-  public async findById(req: Request, res: Response): Promise<void> {
-    const result = await this.filmService.findById(req.params.id);
+  public async show(req: Request, res: Response): Promise<void> {
+    const result = await this.filmService.show(req.params.id);
 
     if (!result) {
       throw new HttpError(

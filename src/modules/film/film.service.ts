@@ -8,8 +8,6 @@ import { Component } from '../../types/component.types.js';
 import UpdateFilmDto from './dto/update-film.dto.js';
 import { DEFAULT_FILM_COUNT } from './film.constant.js';
 
-const PROMO_ID = '63dbb689cba5369b4ce303b7';
-
 @injectable()
 export default class FilmService implements FilmServiceInterface {
   constructor(
@@ -31,13 +29,13 @@ export default class FilmService implements FilmServiceInterface {
       .exec();
   }
 
-  public async deleteById(filmId: string): Promise<DocumentType<FilmEntity> | null> {
+  public async delete(filmId: string): Promise<DocumentType<FilmEntity> | null> {
     return this.filmModel
       .findByIdAndDelete(filmId)
       .exec();
   }
 
-  public async find(): Promise<DocumentType<FilmEntity>[]> {
+  public async index(): Promise<DocumentType<FilmEntity>[]> {
     return this.filmModel
       .find()
       .limit(10)
@@ -53,18 +51,19 @@ export default class FilmService implements FilmServiceInterface {
       .exec();
   }
 
-  public async findById(filmId: string): Promise<DocumentType<FilmEntity> | null> {
+  public async show(filmId: string): Promise<DocumentType<FilmEntity> | null> {
     return this.filmModel
       .findById(filmId)
       .populate('user')
       .exec();
   }
 
-  public async findPromo(): Promise<DocumentType<FilmEntity> | null> {
-    return this.filmModel
-      .findById(PROMO_ID)
+  public async promo(): Promise<DocumentType<FilmEntity> | null> {
+    const result = await this.filmModel
+      .find({ isPromo: true }, {}, { limit: 1 })
       .populate('user')
       .exec();
+    return result[0];
   }
 
   public async incCommentCount(filmId: string): Promise<DocumentType<FilmEntity> | null> {

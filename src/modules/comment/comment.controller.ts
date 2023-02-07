@@ -42,7 +42,7 @@ export default class CommentController extends Controller {
     req: Request<Record<string, unknown>, Record<string, unknown>, CreateCommentDto>,
     res: Response): Promise<void> {
 
-    const existFilm = await this.filmService.findById('63d8c73560a8064cd4514e23');
+    const existFilm = await this.filmService.show('63d8c73560a8064cd4514e23');
 
     if (!existFilm) {
       throw new HttpError(
