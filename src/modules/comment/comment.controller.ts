@@ -10,6 +10,7 @@ import CommentResponse from './response/comment.response.js';
 import { fillDTO } from '../../utils/common.js';
 import { FilmServiceInterface } from '../film/film-service.interface.js';
 import HttpError from '../../common/errors/http-error.js';
+import { ValidateObjectIdMiddleware } from '../../common/middlewares/validate-objectid.middleware.js';
 
 @injectable()
 export default class CommentController extends Controller {
@@ -22,12 +23,21 @@ export default class CommentController extends Controller {
 
     this.logger.info('Register routes for CommentController…');
 
-    this.addRoute({ path: '/:id', method: HttpMethod.Get, handler: this.index });
-    this.addRoute({ path: '/:id', method: HttpMethod.Post, handler: this.create });
+    this.addRoute({
+      path: '/:id',
+      method: HttpMethod.Get,
+      handler: this.index,
+      middlewares: [new ValidateObjectIdMiddleware('id')]
+    });
+    this.addRoute({
+      path: '/:id',
+      method: HttpMethod.Post,
+      handler: this.create,
+      middlewares: [new ValidateObjectIdMiddleware('id')]
+    });
   }
 
   public async index(req: Request, res: Response): Promise<void> {
-
     const comments = await this.commentService.index(req.params.id);
     if (comments) {
       this.ok(res, comments);
@@ -38,18 +48,19 @@ export default class CommentController extends Controller {
   }
 
   public async create(req: Request, res: Response): Promise<void> {
-
-    const existFilm = await this.filmService.show(req.params.id);
+    const filmId = req.params.id;
+    const existFilm = await this.filmService.show(filmId);
 
     if (!existFilm) {
       throw new HttpError(
         StatusCodes.UNPROCESSABLE_ENTITY,
-        `Film with id «${req.params.id}» not exists.`,
+        `Film with id «${filmId}» not exists.`,
         'CommentController'
       );
     }
 
-    const result = await this.commentService.create(req.params.id, req.body);
+    const result = await this.commentService.create(filmId, req.body);
+    await this.filmService.updateRatingByFilmId(filmId, req.body.rating);
     this.send(
       res,
       StatusCodes.CREATED,

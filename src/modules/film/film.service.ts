@@ -71,7 +71,7 @@ export default class FilmService implements FilmServiceInterface {
     return this.filmModel
       .findByIdAndUpdate(filmId, {
         '$inc': {
-          commentCount: 1,
+          commentAmount: 1,
         }
       }).exec();
   }
@@ -83,11 +83,16 @@ export default class FilmService implements FilmServiceInterface {
     if (!result) {
       return;
     }
-    const newRating = (result.rating * result.commentAmount + newGrade) / (result.commentAmount + 1);
 
-    await this.update(filmId, {
-      rating: newRating
-    });
+    const newRating = (result.rating * result.commentAmount + +newGrade) / (result.commentAmount + 1);
+
+    await this.filmModel
+      .findByIdAndUpdate(filmId, {
+        rating: newRating,
+        '$inc': {
+          commentAmount: 1,
+        }
+      });
 
     return newRating;
   }

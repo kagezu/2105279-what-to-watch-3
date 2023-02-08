@@ -8,6 +8,7 @@ import { fillDTO } from '../../utils/common.js';
 import { FavoriteServiceInterface } from './favorite-service.interface.js';
 import { FilmServiceInterface } from '../film/film-service.interface.js';
 import FilmResponse from '../film/response/film.response.js';
+import { ValidateObjectIdMiddleware } from '../../common/middlewares/validate-objectid.middleware.js';
 // import { ConfigInterface } from '../../common/config/config.interface.js';
 
 const DEFAULT_USER_ID = '63dbb223cba5369b4ce303ae';
@@ -23,9 +24,19 @@ export default class FavoriteController extends Controller {
     super(logger);
     this.logger.info('Register routes for UserController…');
 
-    this.addRoute({ path: '/:id/1', method: HttpMethod.Post, handler: this.create });
-    this.addRoute({ path: '/:id/0', method: HttpMethod.Post, handler: this.delete });
-    this.addRoute({ path: '/', method: HttpMethod.Post, handler: this.delete });
+    this.addRoute({
+      path: '/:id/1',
+      method: HttpMethod.Post,
+      handler: this.create,
+      middlewares: [new ValidateObjectIdMiddleware('id')]
+    });
+    this.addRoute({
+      path: '/:id/0',
+      method: HttpMethod.Post,
+      handler: this.delete,
+      middlewares: [new ValidateObjectIdMiddleware('id')]
+    });
+    this.addRoute({ path: '/', method: HttpMethod.Get, handler: this.index });
   }
 
   public async create(req: Request, res: Response,): Promise<void> {

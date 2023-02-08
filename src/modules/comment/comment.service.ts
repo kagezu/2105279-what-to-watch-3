@@ -8,6 +8,8 @@ import { Component } from '../../types/component.types.js';
 import { DEFAULT_COMMENT_COUNT } from './comment.constant.js';
 import { SortType } from '../../types/sort-type.enum.js';
 
+const DEFAULT_USER_ID = '63dbb223cba5369b4ce303ae';
+
 @injectable()
 export default class CommentService implements CommentServiceInterface {
   constructor(
@@ -18,6 +20,7 @@ export default class CommentService implements CommentServiceInterface {
   public async create(filmId: string, dto: CreateCommentDto): Promise<DocumentType<CommentEntity>> {
     const result = await this.CommentModel.create({
       ...dto,
+      author: DEFAULT_USER_ID,
       film: filmId
     });
     this.logger.info(`New Comment created: ${dto.text}`);
