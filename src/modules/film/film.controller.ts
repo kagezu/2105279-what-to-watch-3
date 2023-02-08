@@ -17,6 +17,7 @@ import { DocumentType } from '@typegoose/typegoose';
 import { BeAnObject } from '@typegoose/typegoose/lib/types.js';
 import { CommentServiceInterface } from '../comment/comment-service.interface.js';
 import { ValidateObjectIdMiddleware } from '../../common/middlewares/validate-objectid.middleware.js';
+import { ValidateDtoMiddleware } from '../../common/middlewares/validate-dto.middleware.js';
 
 @injectable()
 export default class FilmController extends Controller {
@@ -29,7 +30,12 @@ export default class FilmController extends Controller {
     super(logger);
     this.logger.info('Register routes for FilmController…');
 
-    this.addRoute({ path: '/', method: HttpMethod.Post, handler: this.create });
+    this.addRoute({
+      path: '/',
+      method: HttpMethod.Post,
+      handler: this.create,
+      middlewares: [new ValidateDtoMiddleware(CreateFilmDto)]
+    });
     this.addRoute({ path: '/', method: HttpMethod.Get, handler: this.index });
     this.addRoute({ path: '/promo', method: HttpMethod.Get, handler: this.promo });
     this.addRoute({
