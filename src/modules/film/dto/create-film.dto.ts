@@ -1,5 +1,5 @@
 import { Genre } from '../../../types/genre.type.js';
-import { IsArray, IsDateString, IsEnum, IsHexColor, IsInt, IsMongoId, IsUrl, MaxLength, MinLength } from 'class-validator';
+import { IsArray, IsDateString, IsEnum, IsHexColor, IsInt, IsMongoId, IsString, IsUrl, MaxLength, MinLength } from 'class-validator';
 import { FilmOption } from '../film.constant.js';
 
 export default class CreateFilmDto {
@@ -18,25 +18,26 @@ export default class CreateFilmDto {
   public genre!: Genre;
 
   @IsInt({ message: 'Released must be integer' })
-  public released!: string;
+  public released!: number;
 
-  @IsUrl({}, { message: 'Released must be URL' })
+  @IsUrl({}, { message: 'Link must be URL' })
   public previewVideoLink!: string;
 
-  @IsUrl({}, { message: 'Released must be URL' })
+  @IsUrl({}, { message: 'Link must be URL' })
   public videoLink!: string;
 
   @IsArray({ message: 'Field actors must be an array' })
+  @IsString({ each: true, message: 'Field actors must be string' })
   public actors!: string[];
 
   @MinLength(FilmOption.MinLengthProducerName, { message: `Min length for producer is ${FilmOption.MinLengthProducerName}` })
   @MaxLength(FilmOption.MaxLengthProducerName, { message: `Max length for producer is ${FilmOption.MaxLengthProducerName}` })
   public producer!: string;
 
-  @IsInt({ message: 'Released must be integer' })
+  @IsInt({ message: 'Runtime must be integer' })
   public runTime!: number;
 
-  @IsMongoId({ message: 'user field must be valid an id' })
+  @IsMongoId({ message: 'User field must be valid an id' })
   public user!: string;
 
   @IsUrl({}, { message: 'Released must be URL' })
