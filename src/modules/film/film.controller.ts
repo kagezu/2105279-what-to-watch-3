@@ -167,13 +167,4 @@ export default class FilmController extends Controller {
       fillDTO(FilmResponse, result)
     );
   }
-  /*
-    private filmFillDTO(film: DocumentType<FilmEntity, BeAnObject>) {
-      const response = fillDTO(FilmResponse, film);
-      return ({
-        ...response,
-        user: fillDTO(UserResponse, film.user)
-      });
-    }
-    */
 }
