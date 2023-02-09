@@ -13,6 +13,8 @@ import { ValidateObjectIdMiddleware } from '../../common/middlewares/validate-ob
 import { ValidateDtoMiddleware } from '../../common/middlewares/validate-dto.middleware.js';
 import CreateCommentDto from './dto/create-comment.dto.js';
 import { DocumentExistsMiddleware } from '../../common/middlewares/document-exists.middleware.js';
+import UserResponse from '../user/response/user.response.js';
+import { UserServiceInterface } from '../user/user-service.interface.js';
 
 @injectable()
 export default class CommentController extends Controller {
@@ -20,6 +22,7 @@ export default class CommentController extends Controller {
     @inject(Component.LoggerInterface) logger: LoggerInterface,
     @inject(Component.CommentServiceInterface) private readonly commentService: CommentServiceInterface,
     @inject(Component.FilmServiceInterface) private readonly filmService: FilmServiceInterface,
+    @inject(Component.UserServiceInterface) private readonly userService: UserServiceInterface,
   ) {
     super(logger);
 
@@ -49,10 +52,9 @@ export default class CommentController extends Controller {
   public async index(req: Request, res: Response): Promise<void> {
     const comments = await this.commentService.index(req.params.id);
     if (comments) {
-      this.ok(res, comments);
+      this.ok(res, comments.map((comment) => fillDTO(CommentResponse, comment)));
       return;
     }
-
     this.noContent(res);
   }
 
@@ -63,7 +65,10 @@ export default class CommentController extends Controller {
     this.send(
       res,
       StatusCodes.CREATED,
-      fillDTO(CommentResponse, result)
+      {
+        ...fillDTO(CommentResponse, result),
+        author: fillDTO(UserResponse, await this.userService.findById(req.body.author))
+      }
     );
   }
 }

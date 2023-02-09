@@ -14,9 +14,6 @@ export default class CreateCommentDto {
   @Max(CommentOption.MaxRates, { message: `Max rates is ${CommentOption.MaxRates}` })
   public rating!: number;
 
-  @IsMongoId({ message: 'film field must be a valid id' })
-  public film!: string;
-
   @IsMongoId({ message: 'user field must be a valid id' })
-  public user!: string;
+  public author!: string;
 }

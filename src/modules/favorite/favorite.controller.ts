@@ -10,9 +10,8 @@ import { FilmServiceInterface } from '../film/film-service.interface.js';
 import FilmResponse from '../film/response/film.response.js';
 import { ValidateObjectIdMiddleware } from '../../common/middlewares/validate-objectid.middleware.js';
 import { DocumentExistsMiddleware } from '../../common/middlewares/document-exists.middleware.js';
-// import { ConfigInterface } from '../../common/config/config.interface.js';
 
-const DEFAULT_USER_ID = '63dbb223cba5369b4ce303ae';
+const DEFAULT_USER_ID = '63e4c6f21a7187b4ec0bd2fe';
 
 @injectable()
 export default class FavoriteController extends Controller {
@@ -20,7 +19,6 @@ export default class FavoriteController extends Controller {
     @inject(Component.LoggerInterface) logger: LoggerInterface,
     @inject(Component.FavoriteServiceInterface) private readonly favoriteService: FavoriteServiceInterface,
     @inject(Component.FilmServiceInterface) private readonly filmService: FilmServiceInterface
-    // @inject(Component.ConfigInterface) private readonly configService: ConfigInterface,
   ) {
     super(logger);
     this.logger.info('Register routes for UserController…');
@@ -47,19 +45,13 @@ export default class FavoriteController extends Controller {
   }
 
   public async create(req: Request, res: Response,): Promise<void> {
-    await this.favoriteService.create({
-      user: DEFAULT_USER_ID,
-      film: req.params.id
-    });
+    await this.favoriteService.create(req.body);
     const result = await this.filmService.show(req.params.id);
     this.ok(res, fillDTO(FilmResponse, result));
   }
 
   public async delete(req: Request, res: Response): Promise<void> {
-    await this.favoriteService.delete({
-      user: DEFAULT_USER_ID,
-      film: req.params.id
-    });
+    await this.favoriteService.delete(req.body);
     const result = await this.filmService.show(req.params.id);
     this.ok(res, fillDTO(FilmResponse, result));
   }

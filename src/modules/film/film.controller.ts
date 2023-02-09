@@ -11,16 +11,13 @@ import { StatusCodes } from 'http-status-codes';
 import { fillDTO } from '../../utils/common.js';
 import FilmResponse from './response/film.response.js';
 import { UserServiceInterface } from '../user/user-service.interface.js';
-import UserResponse from '../user/response/user.response.js';
-import { FilmEntity } from './film.entity.js';
-import { DocumentType } from '@typegoose/typegoose';
-import { BeAnObject } from '@typegoose/typegoose/lib/types.js';
 import { CommentServiceInterface } from '../comment/comment-service.interface.js';
 import { ValidateObjectIdMiddleware } from '../../common/middlewares/validate-objectid.middleware.js';
 import { ValidateDtoMiddleware } from '../../common/middlewares/validate-dto.middleware.js';
 import UpdateFilmDto from './dto/update-film.dto.js';
 import { Genre } from '../../types/genre.type.js';
 import { DocumentExistsMiddleware } from '../../common/middlewares/document-exists.middleware.js';
+import UserResponse from '../user/response/user.response.js';
 
 @injectable()
 export default class FilmController extends Controller {
@@ -81,18 +78,17 @@ export default class FilmController extends Controller {
     res: Response,
   ): Promise<void> {
     const result = await this.filmService.create(body);
-
-    if (result.user) {
-      const user = await this.userService.findById(result.user.toString());
-      this.send(
-        res,
-        StatusCodes.CREATED,
-        {
-          ...fillDTO(FilmResponse, result),
-          user: fillDTO(UserResponse, user)
-        }
-      );
-    }
+    this.send(
+      res,
+      StatusCodes.CREATED,
+      {
+        ...fillDTO(FilmResponse, result),
+        user: fillDTO(
+          UserResponse,
+          await this.userService.findById(body.user)
+        )
+      }
+    );
   }
 
   public async update(req: Request, res: Response): Promise<void> {
@@ -125,15 +121,6 @@ export default class FilmController extends Controller {
     );
   }
 
-  public async promo(_req: Request, res: Response): Promise<void> {
-    const result = await this.filmService.promo();
-    this.send(
-      res,
-      StatusCodes.OK,
-      fillDTO(FilmResponse, result)
-    );
-  }
-
   public async show(req: Request, res: Response): Promise<void> {
     const result = await this.filmService.show(req.params.id);
     this.send(
@@ -143,13 +130,23 @@ export default class FilmController extends Controller {
     );
   }
 
+  public async promo(_req: Request, res: Response): Promise<void> {
+    const result = await this.filmService.promo();
+    this.send(
+      res,
+      StatusCodes.OK,
+      fillDTO(FilmResponse, result)
+    );
+  }
+
+
   public async findByGenre(req: Request, res: Response): Promise<void> {
     const { genre } = req.params;
 
     if (!Object.values(Genre).some((value) => value === genre)) {
       throw new HttpError(
         StatusCodes.BAD_REQUEST,
-        `Genre with ${genre} not implements.`,
+        `Genre with ${genre} not implements, use only: ${Object.values(Genre).join(', ')}`,
         'UserController'
       );
     }
@@ -170,12 +167,13 @@ export default class FilmController extends Controller {
       fillDTO(FilmResponse, result)
     );
   }
-
-  private filmFillDTO(film: DocumentType<FilmEntity, BeAnObject>) {
-    const response = fillDTO(FilmResponse, film);
-    return ({
-      ...response,
-      user: fillDTO(UserResponse, film.user)
-    });
-  }
+  /*
+    private filmFillDTO(film: DocumentType<FilmEntity, BeAnObject>) {
+      const response = fillDTO(FilmResponse, film);
+      return ({
+        ...response,
+        user: fillDTO(UserResponse, film.user)
+      });
+    }
+    */
 }
