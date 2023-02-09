@@ -13,6 +13,7 @@ import HttpError from '../../common/errors/http-error.js';
 import { ValidateObjectIdMiddleware } from '../../common/middlewares/validate-objectid.middleware.js';
 import { ValidateDtoMiddleware } from '../../common/middlewares/validate-dto.middleware.js';
 import CreateCommentDto from './dto/create-comment.dto.js';
+import { DocumentExistsMiddleware } from '../../common/middlewares/document-exists.middleware.js';
 
 @injectable()
 export default class CommentController extends Controller {
@@ -29,7 +30,10 @@ export default class CommentController extends Controller {
       path: '/:id',
       method: HttpMethod.Get,
       handler: this.index,
-      middlewares: [new ValidateObjectIdMiddleware('id')]
+      middlewares: [
+        new ValidateObjectIdMiddleware('id'),
+        new DocumentExistsMiddleware(this.filmService, 'Film', 'id')
+      ]
     });
     this.addRoute({
       path: '/:id',
@@ -37,6 +41,7 @@ export default class CommentController extends Controller {
       handler: this.create,
       middlewares: [
         new ValidateObjectIdMiddleware('id'),
+        new DocumentExistsMiddleware(this.filmService, 'Film', 'id'),
         new ValidateDtoMiddleware(CreateCommentDto)
       ]
     });

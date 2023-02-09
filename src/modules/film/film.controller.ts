@@ -20,6 +20,7 @@ import { ValidateObjectIdMiddleware } from '../../common/middlewares/validate-ob
 import { ValidateDtoMiddleware } from '../../common/middlewares/validate-dto.middleware.js';
 import UpdateFilmDto from './dto/update-film.dto.js';
 import { Genre } from '../../types/genre.type.js';
+import { DocumentExistsMiddleware } from '../../common/middlewares/document-exists.middleware.js';
 
 @injectable()
 export default class FilmController extends Controller {
@@ -44,7 +45,10 @@ export default class FilmController extends Controller {
       path: '/:id',
       method: HttpMethod.Get,
       handler: this.show,
-      middlewares: [new ValidateObjectIdMiddleware('id')]
+      middlewares: [
+        new ValidateObjectIdMiddleware('id'),
+        new DocumentExistsMiddleware(this.filmService, 'Film', 'id')
+      ]
     });
     this.addRoute({
       path: '/:id',
@@ -52,6 +56,7 @@ export default class FilmController extends Controller {
       handler: this.update,
       middlewares: [
         new ValidateObjectIdMiddleware('id'),
+        new DocumentExistsMiddleware(this.filmService, 'Film', 'id'),
         new ValidateDtoMiddleware(UpdateFilmDto)
       ]
     });
@@ -59,7 +64,10 @@ export default class FilmController extends Controller {
       path: '/:id',
       method: HttpMethod.Delete,
       handler: this.delete,
-      middlewares: [new ValidateObjectIdMiddleware('id')]
+      middlewares: [
+        new ValidateObjectIdMiddleware('id'),
+        new DocumentExistsMiddleware(this.filmService, 'Film', 'id')
+      ]
     });
     this.addRoute({
       path: '/genre/:genre',
