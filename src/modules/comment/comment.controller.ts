@@ -6,11 +6,15 @@ import { LoggerInterface } from '../../common/logger/logger.interface.js';
 import { HttpMethod } from '../../types/http-method.enum.js';
 import { CommentServiceInterface } from './comment-service.interface.js';
 import { StatusCodes } from 'http-status-codes';
-import CreateCommentDto from './dto/create-comment.dto.js';
 import CommentResponse from './response/comment.response.js';
 import { fillDTO } from '../../utils/common.js';
 import { FilmServiceInterface } from '../film/film-service.interface.js';
-import HttpError from '../../common/errors/http-error.js';
+import { ValidateObjectIdMiddleware } from '../../common/middlewares/validate-objectid.middleware.js';
+import { ValidateDtoMiddleware } from '../../common/middlewares/validate-dto.middleware.js';
+import CreateCommentDto from './dto/create-comment.dto.js';
+import { DocumentExistsMiddleware } from '../../common/middlewares/document-exists.middleware.js';
+import UserResponse from '../user/response/user.response.js';
+import { UserServiceInterface } from '../user/user-service.interface.js';
 
 @injectable()
 export default class CommentController extends Controller {
@@ -18,45 +22,53 @@ export default class CommentController extends Controller {
     @inject(Component.LoggerInterface) logger: LoggerInterface,
     @inject(Component.CommentServiceInterface) private readonly commentService: CommentServiceInterface,
     @inject(Component.FilmServiceInterface) private readonly filmService: FilmServiceInterface,
+    @inject(Component.UserServiceInterface) private readonly userService: UserServiceInterface,
   ) {
     super(logger);
 
     this.logger.info('Register routes for CommentController…');
 
-    this.addRoute({ path: '/', method: HttpMethod.Get, handler: this.find });
-    this.addRoute({ path: '/', method: HttpMethod.Post, handler: this.create });
+    this.addRoute({
+      path: '/:id',
+      method: HttpMethod.Get,
+      handler: this.index,
+      middlewares: [
+        new ValidateObjectIdMiddleware('id'),
+        new DocumentExistsMiddleware(this.filmService, 'Film', 'id')
+      ]
+    });
+    this.addRoute({
+      path: '/:id',
+      method: HttpMethod.Post,
+      handler: this.create,
+      middlewares: [
+        new ValidateObjectIdMiddleware('id'),
+        new DocumentExistsMiddleware(this.filmService, 'Film', 'id'),
+        new ValidateDtoMiddleware(CreateCommentDto)
+      ]
+    });
   }
 
-  public async find(_req: Request, res: Response): Promise<void> {
-
-    const comments = await this.commentService.findByFilmId('63d8c73560a8064cd4514e23');
+  public async index(req: Request, res: Response): Promise<void> {
+    const comments = await this.commentService.index(req.params.id);
     if (comments) {
-      this.send(res, StatusCodes.OK, comments);
+      this.ok(res, comments.map((comment) => fillDTO(CommentResponse, comment)));
       return;
     }
-
     this.noContent(res);
   }
 
-  public async create(
-    req: Request<Record<string, unknown>, Record<string, unknown>, CreateCommentDto>,
-    res: Response): Promise<void> {
-
-    const existFilm = await this.filmService.findById('63d8c73560a8064cd4514e23');
-
-    if (!existFilm) {
-      throw new HttpError(
-        StatusCodes.UNPROCESSABLE_ENTITY,
-        `Film with id «${'63d8c73560a8064cd4514e23'}» not exists.`,
-        'CommentController'
-      );
-    }
-
-    const result = await this.commentService.create('63d8c73560a8064cd4514e23', req.body);
+  public async create(req: Request, res: Response): Promise<void> {
+    const filmId = req.params.id;
+    const result = await this.commentService.create(filmId, req.body);
+    await this.filmService.updateRating(filmId, req.body.rating);
     this.send(
       res,
       StatusCodes.CREATED,
-      fillDTO(CommentResponse, result)
+      {
+        ...fillDTO(CommentResponse, result),
+        author: fillDTO(UserResponse, await this.userService.findById(req.body.author))
+      }
     );
   }
 }

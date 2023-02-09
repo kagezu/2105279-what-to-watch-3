@@ -1,12 +1,9 @@
 import { User } from '../../types/user.type.js';
 import typegoose, { getModelForClass, defaultClasses } from '@typegoose/typegoose';
 import { createSHA256 } from '../../utils/common.js';
+import { UserOption } from './user.constant.js';
 
 const { prop, modelOptions } = typegoose;
-enum UserOption {
-  MinLengthName = 1,
-  MaxLengthName = 150
-}
 
 export interface UserEntity extends defaultClasses.Base { }
 

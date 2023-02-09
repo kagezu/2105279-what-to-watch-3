@@ -1,4 +1,4 @@
-import { Expose } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
 import UserResponse from '../../user/response/user.response.js';
 
 export default class FilmResponse {
@@ -39,6 +39,7 @@ export default class FilmResponse {
   public commentAmount!: number;
 
   @Expose()
+  @Type(() => UserResponse)
   public user!: UserResponse;
 
   @Expose()

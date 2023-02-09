@@ -11,11 +11,13 @@ import { StatusCodes } from 'http-status-codes';
 import { fillDTO } from '../../utils/common.js';
 import FilmResponse from './response/film.response.js';
 import { UserServiceInterface } from '../user/user-service.interface.js';
+import { CommentServiceInterface } from '../comment/comment-service.interface.js';
+import { ValidateObjectIdMiddleware } from '../../common/middlewares/validate-objectid.middleware.js';
+import { ValidateDtoMiddleware } from '../../common/middlewares/validate-dto.middleware.js';
+import UpdateFilmDto from './dto/update-film.dto.js';
+import { Genre } from '../../types/genre.type.js';
+import { DocumentExistsMiddleware } from '../../common/middlewares/document-exists.middleware.js';
 import UserResponse from '../user/response/user.response.js';
-import { FilmEntity } from './film.entity.js';
-import { DocumentType } from '@typegoose/typegoose';
-import { BeAnObject } from '@typegoose/typegoose/lib/types.js';
-import { ConfigInterface } from '../../common/config/config.interface.js';
 
 @injectable()
 export default class FilmController extends Controller {
@@ -23,18 +25,52 @@ export default class FilmController extends Controller {
     @inject(Component.LoggerInterface) logger: LoggerInterface,
     @inject(Component.UserServiceInterface) private readonly userService: UserServiceInterface,
     @inject(Component.FilmServiceInterface) private readonly filmService: FilmServiceInterface,
-    @inject(Component.ConfigInterface) private readonly configService: ConfigInterface,
+    @inject(Component.CommentServiceInterface) private readonly commentService: CommentServiceInterface,
   ) {
     super(logger);
-    this.logger.info('Register routes for UserController…');
+    this.logger.info('Register routes for FilmController…');
 
-    this.addRoute({ path: '/', method: HttpMethod.Post, handler: this.create });
-    this.addRoute({ path: '/', method: HttpMethod.Get, handler: this.find });
+    this.addRoute({
+      path: '/',
+      method: HttpMethod.Post,
+      handler: this.create,
+      middlewares: [new ValidateDtoMiddleware(CreateFilmDto)]
+    });
+    this.addRoute({ path: '/', method: HttpMethod.Get, handler: this.index });
     this.addRoute({ path: '/promo', method: HttpMethod.Get, handler: this.promo });
-    this.addRoute({ path: '/:id', method: HttpMethod.Get, handler: this.findById });
-    this.addRoute({ path: '/:id', method: HttpMethod.Patch, handler: this.update });
-    this.addRoute({ path: '/:id', method: HttpMethod.Delete, handler: this.delete });
-    this.addRoute({ path: '/genre/:genre', method: HttpMethod.Get, handler: this.findByGenre });
+    this.addRoute({
+      path: '/:id',
+      method: HttpMethod.Get,
+      handler: this.show,
+      middlewares: [
+        new ValidateObjectIdMiddleware('id'),
+        new DocumentExistsMiddleware(this.filmService, 'Film', 'id')
+      ]
+    });
+    this.addRoute({
+      path: '/:id',
+      method: HttpMethod.Patch,
+      handler: this.update,
+      middlewares: [
+        new ValidateObjectIdMiddleware('id'),
+        new DocumentExistsMiddleware(this.filmService, 'Film', 'id'),
+        new ValidateDtoMiddleware(UpdateFilmDto)
+      ]
+    });
+    this.addRoute({
+      path: '/:id',
+      method: HttpMethod.Delete,
+      handler: this.delete,
+      middlewares: [
+        new ValidateObjectIdMiddleware('id'),
+        new DocumentExistsMiddleware(this.filmService, 'Film', 'id')
+      ]
+    });
+    this.addRoute({
+      path: '/genre/:genre',
+      method: HttpMethod.Get,
+      handler: this.findByGenre
+    });
   }
 
   public async create(
@@ -42,60 +78,42 @@ export default class FilmController extends Controller {
     res: Response,
   ): Promise<void> {
     const result = await this.filmService.create(body);
-
-    if (result.user) {
-      const user = await this.userService.findById(result.user.toString());
-      this.send(
-        res,
-        StatusCodes.CREATED,
-        {
-          ...fillDTO(FilmResponse, result),
-          user: fillDTO(UserResponse, user)
-        }
-      );
-    }
+    this.send(
+      res,
+      StatusCodes.CREATED,
+      {
+        ...fillDTO(FilmResponse, result),
+        user: fillDTO(
+          UserResponse,
+          await this.userService.findById(body.user)
+        )
+      }
+    );
   }
 
   public async update(req: Request, res: Response): Promise<void> {
     const result = await this.filmService.update(req.params.id, req.body);
-
-    if (!result) {
-      throw new HttpError(
-        StatusCodes.NOT_FOUND,
-        'Film not exists.',
-        'UserController'
-      );
-    }
-
     this.send(
       res,
       StatusCodes.CREATED,
-      this.filmFillDTO(result)
+      fillDTO(FilmResponse, result)
     );
   }
 
   public async delete(req: Request, res: Response): Promise<void> {
-    const result = await this.filmService.deleteById(req.params.id);
-
-    if (!result) {
-      throw new HttpError(
-        StatusCodes.NOT_FOUND,
-        'Film not exists.',
-        'UserController'
-      );
-    }
-
+    await this.commentService.delete(req.params.id);
+    const result = await this.filmService.delete(req.params.id);
     this.send(
       res,
       StatusCodes.OK,
-      this.filmFillDTO(result)
+      fillDTO(FilmResponse, result)
     );
   }
 
 
-  public async find(_req: Request, res: Response): Promise<void> {
-    const result = await this.filmService.find();
-    const response = result.map(this.filmFillDTO);
+  public async index(_req: Request, res: Response): Promise<void> {
+    const result = await this.filmService.index();
+    const response = result.map((value) => fillDTO(FilmResponse, value));
     this.send(
       res,
       StatusCodes.OK,
@@ -103,49 +121,42 @@ export default class FilmController extends Controller {
     );
   }
 
+  public async show(req: Request, res: Response): Promise<void> {
+    const result = await this.filmService.show(req.params.id);
+    this.send(
+      res,
+      StatusCodes.OK,
+      fillDTO(FilmResponse, result)
+    );
+  }
+
   public async promo(_req: Request, res: Response): Promise<void> {
-    const result = await this.filmService.findPromo();
-
-    if (!result) {
-      throw new HttpError(
-        StatusCodes.NOT_FOUND,
-        'Promo film not exists.',
-        'UserController'
-      );
-    }
-
+    const result = await this.filmService.promo();
     this.send(
       res,
       StatusCodes.OK,
-      this.filmFillDTO(result)
+      fillDTO(FilmResponse, result)
     );
   }
 
-  public async findById(req: Request, res: Response): Promise<void> {
-    const result = await this.filmService.findById(req.params.id);
-
-    if (!result) {
-      throw new HttpError(
-        StatusCodes.NOT_FOUND,
-        'Film not exists.',
-        'UserController'
-      );
-    }
-
-    this.send(
-      res,
-      StatusCodes.OK,
-      this.filmFillDTO(result)
-    );
-  }
 
   public async findByGenre(req: Request, res: Response): Promise<void> {
-    const result = await this.filmService.findByGenre(req.params.genre);
+    const { genre } = req.params;
+
+    if (!Object.values(Genre).some((value) => value === genre)) {
+      throw new HttpError(
+        StatusCodes.BAD_REQUEST,
+        `Genre with ${genre} not implements, use only: ${Object.values(Genre).join(', ')}`,
+        'UserController'
+      );
+    }
+
+    const result = await this.filmService.findByGenre(genre);
 
     if (!result) {
       throw new HttpError(
         StatusCodes.NOT_FOUND,
-        `Film with genre ${req.params.genre} not exists.`,
+        `Film with genre ${genre} not exists.`,
         'UserController'
       );
     }
@@ -153,15 +164,7 @@ export default class FilmController extends Controller {
     this.send(
       res,
       StatusCodes.OK,
-      result.map(this.filmFillDTO)
+      fillDTO(FilmResponse, result)
     );
-  }
-
-  private filmFillDTO(film: DocumentType<FilmEntity, BeAnObject>) {
-    const response = fillDTO(FilmResponse, film);
-    return ({
-      ...response,
-      user: fillDTO(UserResponse, film.user)
-    });
   }
 }

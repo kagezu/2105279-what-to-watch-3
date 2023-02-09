@@ -25,7 +25,7 @@ export default class CommentService implements CommentServiceInterface {
     return result;
   }
 
-  public async deleteByFilmId(filmId: string): Promise<number> {
+  public async delete(filmId: string): Promise<number> {
     const result = await this.CommentModel
       .deleteMany({ film: filmId })
       .exec();
@@ -33,7 +33,7 @@ export default class CommentService implements CommentServiceInterface {
     return result.deletedCount;
   }
 
-  public async findByFilmId(filmId: string, count?: number): Promise<DocumentType<CommentEntity>[] | null> {
+  public async index(filmId: string, count?: number): Promise<DocumentType<CommentEntity>[] | null> {
     const limit = count ?? DEFAULT_COMMENT_COUNT;
     return await this.CommentModel
       .find({ film: filmId })

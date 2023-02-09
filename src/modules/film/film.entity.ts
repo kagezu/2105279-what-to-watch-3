@@ -115,6 +115,11 @@ export class FilmEntity extends defaultClasses.TimeStamps {
     default: FilmOption.DefaultColor
   })
   public color!: string;
+
+  @prop({
+    default: false
+  })
+  public isPromo!: boolean;
 }
 
 export const FilmModel = getModelForClass(FilmEntity);
