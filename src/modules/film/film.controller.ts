@@ -18,6 +18,8 @@ import { BeAnObject } from '@typegoose/typegoose/lib/types.js';
 import { CommentServiceInterface } from '../comment/comment-service.interface.js';
 import { ValidateObjectIdMiddleware } from '../../common/middlewares/validate-objectid.middleware.js';
 import { ValidateDtoMiddleware } from '../../common/middlewares/validate-dto.middleware.js';
+import UpdateFilmDto from './dto/update-film.dto.js';
+import { Genre } from '../../types/genre.type.js';
 
 @injectable()
 export default class FilmController extends Controller {
@@ -48,7 +50,10 @@ export default class FilmController extends Controller {
       path: '/:id',
       method: HttpMethod.Patch,
       handler: this.update,
-      middlewares: [new ValidateObjectIdMiddleware('id')]
+      middlewares: [
+        new ValidateObjectIdMiddleware('id'),
+        new ValidateDtoMiddleware(UpdateFilmDto)
+      ]
     });
     this.addRoute({
       path: '/:id',
@@ -167,12 +172,22 @@ export default class FilmController extends Controller {
   }
 
   public async findByGenre(req: Request, res: Response): Promise<void> {
-    const result = await this.filmService.findByGenre(req.params.genre);
+    const { genre } = req.params;
+
+    if (!Object.values(Genre).some((value) => value === genre)) {
+      throw new HttpError(
+        StatusCodes.BAD_REQUEST,
+        `Genre with ${genre} not implements.`,
+        'UserController'
+      );
+    }
+
+    const result = await this.filmService.findByGenre(genre);
 
     if (!result) {
       throw new HttpError(
         StatusCodes.NOT_FOUND,
-        `Film with genre ${req.params.genre} not exists.`,
+        `Film with genre ${genre} not exists.`,
         'UserController'
       );
     }

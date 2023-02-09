@@ -11,6 +11,8 @@ import { fillDTO } from '../../utils/common.js';
 import { FilmServiceInterface } from '../film/film-service.interface.js';
 import HttpError from '../../common/errors/http-error.js';
 import { ValidateObjectIdMiddleware } from '../../common/middlewares/validate-objectid.middleware.js';
+import { ValidateDtoMiddleware } from '../../common/middlewares/validate-dto.middleware.js';
+import CreateCommentDto from './dto/create-comment.dto.js';
 
 @injectable()
 export default class CommentController extends Controller {
@@ -33,7 +35,10 @@ export default class CommentController extends Controller {
       path: '/:id',
       method: HttpMethod.Post,
       handler: this.create,
-      middlewares: [new ValidateObjectIdMiddleware('id')]
+      middlewares: [
+        new ValidateObjectIdMiddleware('id'),
+        new ValidateDtoMiddleware(CreateCommentDto)
+      ]
     });
   }
 
