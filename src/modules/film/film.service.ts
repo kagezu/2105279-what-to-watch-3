@@ -30,7 +30,6 @@ export default class FilmService implements FilmServiceInterface {
   }
 
   public async delete(filmId: string): Promise<DocumentType<FilmEntity> | null> {
-
     return this.filmModel
       .findByIdAndDelete(filmId)
       .exec();
@@ -67,16 +66,7 @@ export default class FilmService implements FilmServiceInterface {
     return result[0];
   }
 
-  public async incCommentCount(filmId: string): Promise<DocumentType<FilmEntity> | null> {
-    return this.filmModel
-      .findByIdAndUpdate(filmId, {
-        '$inc': {
-          commentAmount: 1,
-        }
-      }).exec();
-  }
-
-  public async updateRatingByFilmId(filmId: string, newGrade: number): Promise<number | undefined> {
+  public async updateRating(filmId: string, newGrade: number): Promise<number | undefined> {
     const result = await this.filmModel
       .findById(filmId)
       .exec();
@@ -85,7 +75,6 @@ export default class FilmService implements FilmServiceInterface {
     }
 
     const newRating = (result.rating * result.commentAmount + +newGrade) / (result.commentAmount + 1);
-
     await this.filmModel
       .findByIdAndUpdate(filmId, {
         rating: newRating,

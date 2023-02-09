@@ -27,9 +27,6 @@ export interface FilmServiceInterface extends DocumentExistsInterface {
   /** Получение промо - фильма*/
   promo(): Promise<DocumentType<FilmEntity> | null>;
 
-  /** Увеличение счётчика комментариев*/
-  incCommentCount(FilmId: string): Promise<DocumentType<FilmEntity> | null>;
-
-  /** Расчетать и обновить рейтинг для определённого фильма*/
-  updateRatingByFilmId(filmId: string, newGrade: number): Promise<number | undefined>;
+  /** Обновить рейтинг и число комментариев к фильму*/
+  updateRating(filmId: string, newGrade: number): Promise<number | undefined>;
 }

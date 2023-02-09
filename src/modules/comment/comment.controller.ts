@@ -9,7 +9,6 @@ import { StatusCodes } from 'http-status-codes';
 import CommentResponse from './response/comment.response.js';
 import { fillDTO } from '../../utils/common.js';
 import { FilmServiceInterface } from '../film/film-service.interface.js';
-import HttpError from '../../common/errors/http-error.js';
 import { ValidateObjectIdMiddleware } from '../../common/middlewares/validate-objectid.middleware.js';
 import { ValidateDtoMiddleware } from '../../common/middlewares/validate-dto.middleware.js';
 import CreateCommentDto from './dto/create-comment.dto.js';
@@ -59,18 +58,8 @@ export default class CommentController extends Controller {
 
   public async create(req: Request, res: Response): Promise<void> {
     const filmId = req.params.id;
-    const existFilm = await this.filmService.show(filmId);
-
-    if (!existFilm) {
-      throw new HttpError(
-        StatusCodes.UNPROCESSABLE_ENTITY,
-        `Film with id «${filmId}» not exists.`,
-        'CommentController'
-      );
-    }
-
     const result = await this.commentService.create(filmId, req.body);
-    await this.filmService.updateRatingByFilmId(filmId, req.body.rating);
+    await this.filmService.updateRating(filmId, req.body.rating);
     this.send(
       res,
       StatusCodes.CREATED,

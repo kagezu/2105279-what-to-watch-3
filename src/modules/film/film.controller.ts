@@ -97,45 +97,27 @@ export default class FilmController extends Controller {
 
   public async update(req: Request, res: Response): Promise<void> {
     const result = await this.filmService.update(req.params.id, req.body);
-
-    if (!result) {
-      throw new HttpError(
-        StatusCodes.NOT_FOUND,
-        'Film not exists.',
-        'UserController'
-      );
-    }
-
     this.send(
       res,
       StatusCodes.CREATED,
-      this.filmFillDTO(result)
+      fillDTO(FilmResponse, result)
     );
   }
 
   public async delete(req: Request, res: Response): Promise<void> {
     await this.commentService.delete(req.params.id);
     const result = await this.filmService.delete(req.params.id);
-
-    if (!result) {
-      throw new HttpError(
-        StatusCodes.NOT_FOUND,
-        'Film not exists.',
-        'UserController'
-      );
-    }
-
     this.send(
       res,
       StatusCodes.OK,
-      this.filmFillDTO(result)
+      fillDTO(FilmResponse, result)
     );
   }
 
 
   public async index(_req: Request, res: Response): Promise<void> {
     const result = await this.filmService.index();
-    const response = result.map(this.filmFillDTO);
+    const response = result.map((value) => fillDTO(FilmResponse, value));
     this.send(
       res,
       StatusCodes.OK,
@@ -145,37 +127,19 @@ export default class FilmController extends Controller {
 
   public async promo(_req: Request, res: Response): Promise<void> {
     const result = await this.filmService.promo();
-
-    if (!result) {
-      throw new HttpError(
-        StatusCodes.NOT_FOUND,
-        'Promo film not exists.',
-        'UserController'
-      );
-    }
-
     this.send(
       res,
       StatusCodes.OK,
-      this.filmFillDTO(result)
+      fillDTO(FilmResponse, result)
     );
   }
 
   public async show(req: Request, res: Response): Promise<void> {
     const result = await this.filmService.show(req.params.id);
-
-    if (!result) {
-      throw new HttpError(
-        StatusCodes.NOT_FOUND,
-        'Film not exists.',
-        'UserController'
-      );
-    }
-
     this.send(
       res,
       StatusCodes.OK,
-      this.filmFillDTO(result)
+      fillDTO(FilmResponse, result)
     );
   }
 
@@ -203,7 +167,7 @@ export default class FilmController extends Controller {
     this.send(
       res,
       StatusCodes.OK,
-      result.map(this.filmFillDTO)
+      fillDTO(FilmResponse, result)
     );
   }
 

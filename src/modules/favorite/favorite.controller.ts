@@ -9,6 +9,7 @@ import { FavoriteServiceInterface } from './favorite-service.interface.js';
 import { FilmServiceInterface } from '../film/film-service.interface.js';
 import FilmResponse from '../film/response/film.response.js';
 import { ValidateObjectIdMiddleware } from '../../common/middlewares/validate-objectid.middleware.js';
+import { DocumentExistsMiddleware } from '../../common/middlewares/document-exists.middleware.js';
 // import { ConfigInterface } from '../../common/config/config.interface.js';
 
 const DEFAULT_USER_ID = '63dbb223cba5369b4ce303ae';
@@ -28,13 +29,19 @@ export default class FavoriteController extends Controller {
       path: '/:id/1',
       method: HttpMethod.Post,
       handler: this.create,
-      middlewares: [new ValidateObjectIdMiddleware('id')]
+      middlewares: [
+        new ValidateObjectIdMiddleware('id'),
+        new DocumentExistsMiddleware(this.filmService, 'Film', 'id')
+      ]
     });
     this.addRoute({
       path: '/:id/0',
       method: HttpMethod.Post,
       handler: this.delete,
-      middlewares: [new ValidateObjectIdMiddleware('id')]
+      middlewares: [
+        new ValidateObjectIdMiddleware('id'),
+        new DocumentExistsMiddleware(this.filmService, 'Film', 'id')
+      ]
     });
     this.addRoute({ path: '/', method: HttpMethod.Get, handler: this.index });
   }
@@ -44,7 +51,6 @@ export default class FavoriteController extends Controller {
       user: DEFAULT_USER_ID,
       film: req.params.id
     });
-
     const result = await this.filmService.show(req.params.id);
     this.ok(res, fillDTO(FilmResponse, result));
   }
@@ -54,14 +60,12 @@ export default class FavoriteController extends Controller {
       user: DEFAULT_USER_ID,
       film: req.params.id
     });
-
     const result = await this.filmService.show(req.params.id);
     this.ok(res, fillDTO(FilmResponse, result));
   }
 
   public async index(_req: Request, res: Response): Promise<void> {
     const result = await this.favoriteService.index(DEFAULT_USER_ID);
-
     this.ok(res, result.map((value) => fillDTO(FilmResponse, value.film)));
   }
 }
