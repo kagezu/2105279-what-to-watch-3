@@ -29,7 +29,6 @@ export default class FavoriteService implements FavoriteServiceInterface {
       .find({ user })
       .limit(10)
       .populate('film')
-      .populate('user')
       .exec();
   }
 }

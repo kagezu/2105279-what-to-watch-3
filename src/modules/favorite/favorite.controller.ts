@@ -61,4 +61,3 @@ export default class FavoriteController extends Controller {
     this.ok(res, result.map((value) => fillDTO(FilmResponse, value.film)));
   }
 }
-

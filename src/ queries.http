@@ -130,13 +130,19 @@ Content-Type: application/json
 # К просмотру
 
 ## Добавление (удаление) к просмотру
-POST http://localhost:3123//favorite/63e4dbeab412d53bf0db080a/1 HTTP/1.1
+POST http://localhost:3123/favorite/63e4d70a5686fbfed53c0e2a/1 HTTP/1.1
 Content-Type: application/json
 
 {
-  "film":"63e4dbeab412d53bf0db080a",
+  "film":"63e4d70a5686fbfed53c0e2a",
   "user":"63e4c6f21a7187b4ec0bd2fe"
 }
+
+###
+
+## Список фильмов к просмотру
+GET  http://localhost:3123/favorite HTTP/1.1
+Content-Type: application/json
 
 ###
 
