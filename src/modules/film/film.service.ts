@@ -6,14 +6,13 @@ import { FilmServiceInterface } from './film-service.interface.js';
 import { LoggerInterface } from '../../common/logger/logger.interface.js';
 import { Component } from '../../types/component.types.js';
 import UpdateFilmDto from './dto/update-film.dto.js';
-import { ConfigInterface } from '../../common/config/config.interface.js';
+import { DEFAULT_FILM_COUNT } from './film.constant.js';
 
 @injectable()
 export default class FilmService implements FilmServiceInterface {
   constructor(
     @inject(Component.LoggerInterface) private logger: LoggerInterface,
-    @inject(Component.FilmModel) private readonly filmModel: types.ModelType<FilmEntity>,
-    @inject(Component.ConfigInterface) private readonly configService: ConfigInterface
+    @inject(Component.FilmModel) private readonly filmModel: types.ModelType<FilmEntity>
   ) { }
 
   public async create(dto: CreateFilmDto): Promise<DocumentType<FilmEntity>> {
@@ -36,7 +35,7 @@ export default class FilmService implements FilmServiceInterface {
   }
 
   public async index(count?: number): Promise<DocumentType<FilmEntity>[]> {
-    const limit = count ? count : this.configService.get('DEFAULT_FILM_COUNT_LIMIT');
+    const limit = count ?? DEFAULT_FILM_COUNT;
     return this.filmModel
       .find()
       .limit(limit)
@@ -45,7 +44,7 @@ export default class FilmService implements FilmServiceInterface {
   }
 
   public async findByGenre(genre: string, count?: number): Promise<DocumentType<FilmEntity>[]> {
-    const limit = count ? count : this.configService.get('DEFAULT_FILM_COUNT_LIMIT');
+    const limit = count ?? DEFAULT_FILM_COUNT;
     return this.filmModel
       .find({ genre }, {}, { limit })
       .populate('user')

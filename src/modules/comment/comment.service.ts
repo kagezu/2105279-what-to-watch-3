@@ -6,14 +6,13 @@ import { CommentServiceInterface } from './comment-service.interface.js';
 import { LoggerInterface } from '../../common/logger/logger.interface.js';
 import { Component } from '../../types/component.types.js';
 import { SortType } from '../../types/sort-type.enum.js';
-import { ConfigInterface } from '../../common/config/config.interface.js';
+import { DEFAULT_COMMENT_COUNT } from './comment.constant.js';
 
 @injectable()
 export default class CommentService implements CommentServiceInterface {
   constructor(
     @inject(Component.LoggerInterface) private logger: LoggerInterface,
-    @inject(Component.CommentModel) private readonly CommentModel: types.ModelType<CommentEntity>,
-    @inject(Component.ConfigInterface) private readonly configService: ConfigInterface
+    @inject(Component.CommentModel) private readonly CommentModel: types.ModelType<CommentEntity>
   ) { }
 
   public async create(filmId: string, dto: CreateCommentDto): Promise<DocumentType<CommentEntity>> {
@@ -35,7 +34,7 @@ export default class CommentService implements CommentServiceInterface {
   }
 
   public async index(filmId: string, count?: number): Promise<DocumentType<CommentEntity>[] | null> {
-    const limit = count ?? this.configService.get('DEFAULT_COMMENT_COUNT_LIMIT');
+    const limit = count ?? DEFAULT_COMMENT_COUNT;
     return await this.CommentModel
       .find({ film: filmId }, {}, { limit })
       .sort({ createdAt: SortType.Down })
