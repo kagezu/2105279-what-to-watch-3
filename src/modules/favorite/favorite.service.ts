@@ -24,6 +24,11 @@ export default class FavoriteService implements FavoriteServiceInterface {
     this.logger.info(`Deleted film from favorite: ${dto.film} for user: ${dto.user}`);
   }
 
+  public async deleteAll(filmId: string): Promise<void> {
+    await this.favoriteModel.deleteMany({ film: filmId });
+    this.logger.info(`Deleted film from favorite: ${filmId} for all user`);
+  }
+
   public async index(user: string): Promise<DocumentType<FavoriteEntity>[]> {
     return this.favoriteModel
       .find({ user })

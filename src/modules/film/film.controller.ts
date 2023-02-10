@@ -18,6 +18,7 @@ import UpdateFilmDto from './dto/update-film.dto.js';
 import { Genre } from '../../types/genre.type.js';
 import { DocumentExistsMiddleware } from '../../common/middlewares/document-exists.middleware.js';
 import UserResponse from '../user/response/user.response.js';
+import { FavoriteServiceInterface } from '../favorite/favorite-service.interface.js';
 
 @injectable()
 export default class FilmController extends Controller {
@@ -26,6 +27,7 @@ export default class FilmController extends Controller {
     @inject(Component.UserServiceInterface) private readonly userService: UserServiceInterface,
     @inject(Component.FilmServiceInterface) private readonly filmService: FilmServiceInterface,
     @inject(Component.CommentServiceInterface) private readonly commentService: CommentServiceInterface,
+    @inject(Component.FavoriteServiceInterface) private readonly favoriteService: FavoriteServiceInterface,
   ) {
     super(logger);
     this.logger.info('Register routes for FilmController…');
@@ -101,8 +103,10 @@ export default class FilmController extends Controller {
   }
 
   public async delete(req: Request, res: Response): Promise<void> {
-    await this.commentService.delete(req.params.id);
-    const result = await this.filmService.delete(req.params.id);
+    const filmId = req.params.id;
+    await this.commentService.delete(filmId);
+    await this.favoriteService.deleteAll(filmId);
+    const result = await this.filmService.delete(filmId);
     this.send(
       res,
       StatusCodes.OK,
