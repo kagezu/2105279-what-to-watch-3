@@ -27,7 +27,6 @@ export default class FavoriteService implements FavoriteServiceInterface {
   public async index(user: string): Promise<DocumentType<FavoriteEntity>[]> {
     return this.favoriteModel
       .find({ user })
-      .limit(10)
       .populate({
         path: 'film',
         populate: 'user'
