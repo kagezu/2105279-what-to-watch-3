@@ -8,7 +8,7 @@ export default class FilmResponse {
   @Expose()
   public description!: string;
 
-  @Expose()
+  @Expose({ name: 'createdAt' })
   public publicationDate!: string;
 
   @Expose()

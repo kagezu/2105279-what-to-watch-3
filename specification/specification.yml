@@ -115,6 +115,35 @@ paths:
         "403":
           description: Выход не выполнен
 
+  /users/{id}/avatar:
+    post:
+      tags:
+        - users
+      summary: Загружает аватарку пользователя.
+      description: Загружает изображение (аватар) пользователя на сервер.
+      parameters:
+        - name: X-Token
+          in: header
+          description: Авторизационный токен пользователя
+          required: true
+          schema:
+            $ref: "#/components/schemas/x-token"
+
+      requestBody:
+        description: Изображение.
+        content:
+          multipart/form-data:
+            name: string
+            filename: sting
+        required: true
+
+      responses:
+        "201":
+          description: Изображение успешно загружено
+
+        "403":
+          description: Выход не выполнен
+
   /films/promo:
     get:
       tags:
