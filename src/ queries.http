@@ -35,7 +35,6 @@ Content-Type: application/json
 {
   "name": "xx",
   "description":  "descriptiondescriptiondescription",
-  "publicationDate":  "2022-05-12T11:56:37.573Z",
   "genre":  "crime",
   "released":  1955,
   "previewVideoLink":  "https://github.com",
@@ -59,7 +58,6 @@ Content-Type: application/json
 {
   "name": "1-1",
   "description":  "descriptiondescriptiondescription",
-  "publicationDate":  "2022-05-12T11:56:37.573Z",
   "genre":  "crime",
   "released":  1955,
   "previewVideoLink":  "https://github.com",

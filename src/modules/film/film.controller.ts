@@ -53,8 +53,8 @@ export default class FilmController extends Controller {
       handler: this.update,
       middlewares: [
         new ValidateObjectIdMiddleware('id'),
-        new DocumentExistsMiddleware(this.filmService, 'Film', 'id'),
-        new ValidateDtoMiddleware(UpdateFilmDto)
+        new ValidateDtoMiddleware(UpdateFilmDto),
+        new DocumentExistsMiddleware(this.filmService, 'Film', 'id')
       ]
     });
     this.addRoute({
@@ -110,7 +110,6 @@ export default class FilmController extends Controller {
     );
   }
 
-
   public async index(_req: Request, res: Response): Promise<void> {
     const result = await this.filmService.index();
     const response = result.map((value) => fillDTO(FilmResponse, value));
@@ -138,7 +137,6 @@ export default class FilmController extends Controller {
       fillDTO(FilmResponse, result)
     );
   }
-
 
   public async findByGenre(req: Request, res: Response): Promise<void> {
     const { genre } = req.params;
