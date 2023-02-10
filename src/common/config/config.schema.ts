@@ -13,6 +13,7 @@ export type ConfigSchema = {
   DB_NAME: string;
   DEFAULT_FILM_COUNT_LIMIT: number;
   DEFAULT_COMMENT_COUNT_LIMIT: number;
+  UPLOAD_DIRECTORY: string
 }
 
 export const configSchema = convict<ConfigSchema>({
@@ -69,5 +70,11 @@ export const configSchema = convict<ConfigSchema>({
     format: Number,
     env: 'DEFAULT_COMMENT_COUNT_LIMIT',
     default: 50,
+  },
+  UPLOAD_DIRECTORY: {
+    doc: 'Directory for upload files',
+    format: String,
+    env: 'UPLOAD_DIRECTORY',
+    default: null
   }
 });

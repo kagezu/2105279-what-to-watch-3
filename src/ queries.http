@@ -144,3 +144,16 @@ Content-Type: application/json
 
 ###
 
+# Загрузки
+
+## Отправка аватарки пользователю
+
+POST http://localhost:3123/users/63e4c6f21a7187b4ec0bd2fe/avatar HTTP/1.1
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="avatar"; filename="102.jpg"
+Content-Type: image/png
+
+< /home/hinto/data/image/icon-creator/102.jpg
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
