@@ -28,7 +28,10 @@ export default class FavoriteService implements FavoriteServiceInterface {
     return this.favoriteModel
       .find({ user })
       .limit(10)
-      .populate('film')
+      .populate({
+        path: 'film',
+        populate: 'user'
+      })
       .exec();
   }
 }
