@@ -20,6 +20,7 @@ import { DocumentExistsMiddleware } from '../../common/middlewares/document-exis
 import UserResponse from '../user/response/user.response.js';
 import { FavoriteServiceInterface } from '../favorite/favorite-service.interface.js';
 import { PrivateRouteMiddleware } from '../../common/middlewares/private-route.middleware.js';
+import FilmDetailResponse from './response/film-detail.response.js';
 
 @injectable()
 export default class FilmController extends Controller {
@@ -90,11 +91,12 @@ export default class FilmController extends Controller {
       res,
       StatusCodes.CREATED,
       {
-        ...fillDTO(FilmResponse, result),
+        ...fillDTO(FilmDetailResponse, result),
         user: fillDTO(
           UserResponse,
           await this.userService.findById(user.id)
-        )
+        ),
+        isFavorite: false
       }
     );
   }
@@ -108,7 +110,7 @@ export default class FilmController extends Controller {
       this.send(
         res,
         StatusCodes.CREATED,
-        fillDTO(FilmResponse, result)
+        fillDTO(FilmDetailResponse, result)
       );
     }
 
@@ -158,7 +160,7 @@ export default class FilmController extends Controller {
     this.send(
       res,
       StatusCodes.OK,
-      fillDTO(FilmResponse, result)
+      fillDTO(FilmDetailResponse, result)
     );
   }
 
@@ -167,7 +169,7 @@ export default class FilmController extends Controller {
     this.send(
       res,
       StatusCodes.OK,
-      fillDTO(FilmResponse, result)
+      fillDTO(FilmDetailResponse, result)
     );
   }
 
