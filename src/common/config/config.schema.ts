@@ -11,9 +11,8 @@ export type ConfigSchema = {
   DB_PASSWORD: string;
   DB_PORT: number;
   DB_NAME: string;
-  DEFAULT_FILM_COUNT_LIMIT: number;
-  DEFAULT_COMMENT_COUNT_LIMIT: number;
   UPLOAD_DIRECTORY: string
+  JWT_SECRET: string;
 }
 
 export const configSchema = convict<ConfigSchema>({
@@ -59,22 +58,16 @@ export const configSchema = convict<ConfigSchema>({
     env: 'DB_NAME',
     default: 'course-nodejs-restapi'
   },
-  DEFAULT_FILM_COUNT_LIMIT: {
-    doc: 'Count of films given by default',
-    format: Number,
-    env: 'DEFAULT_FILM_COUNT_LIMIT',
-    default: 60,
-  },
-  DEFAULT_COMMENT_COUNT_LIMIT: {
-    doc: 'Count of comments given by default',
-    format: Number,
-    env: 'DEFAULT_COMMENT_COUNT_LIMIT',
-    default: 50,
-  },
   UPLOAD_DIRECTORY: {
     doc: 'Directory for upload files',
     format: String,
     env: 'UPLOAD_DIRECTORY',
+    default: null
+  },
+  JWT_SECRET: {
+    doc: 'Secret for sign JWT',
+    format: String,
+    env: 'JWT_SECRET',
     default: null
   }
 });

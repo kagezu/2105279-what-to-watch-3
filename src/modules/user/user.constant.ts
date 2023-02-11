@@ -4,3 +4,5 @@ export enum UserOption {
   MinLengthPassword = 6,
   MaxLengthPassword = 12
 }
+
+export const JWT_ALGORITM = 'HS256';

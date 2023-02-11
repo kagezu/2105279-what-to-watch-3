@@ -114,6 +114,11 @@ export class FilmEntity extends defaultClasses.TimeStamps {
     default: false
   })
   public isPromo!: boolean;
+
+  @prop({
+    default: false
+  })
+  public isFavorite!: boolean;
 }
 
 export const FilmModel = getModelForClass(FilmEntity);

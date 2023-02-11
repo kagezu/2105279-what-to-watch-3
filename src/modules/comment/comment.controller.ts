@@ -15,6 +15,7 @@ import CreateCommentDto from './dto/create-comment.dto.js';
 import { DocumentExistsMiddleware } from '../../common/middlewares/document-exists.middleware.js';
 import UserResponse from '../user/response/user.response.js';
 import { UserServiceInterface } from '../user/user-service.interface.js';
+import { PrivateRouteMiddleware } from '../../common/middlewares/private-route.middleware.js';
 
 @injectable()
 export default class CommentController extends Controller {
@@ -42,6 +43,7 @@ export default class CommentController extends Controller {
       method: HttpMethod.Post,
       handler: this.create,
       middlewares: [
+        new PrivateRouteMiddleware(),
         new ValidateObjectIdMiddleware('id'),
         new ValidateDtoMiddleware(CreateCommentDto),
         new DocumentExistsMiddleware(this.filmService, 'Film', 'id')
@@ -59,15 +61,17 @@ export default class CommentController extends Controller {
   }
 
   public async create(req: Request, res: Response): Promise<void> {
+    const { body } = req;
     const filmId = req.params.id;
-    const result = await this.commentService.create(filmId, req.body);
-    await this.filmService.updateRating(filmId, req.body.rating);
+    const author = req.user.id;
+    const result = await this.commentService.create(filmId, { ...body, author });
+    await this.filmService.updateRating(filmId, body.rating);
     this.send(
       res,
       StatusCodes.CREATED,
       {
         ...fillDTO(CommentResponse, result),
-        author: fillDTO(UserResponse, await this.userService.findById(req.body.author))
+        author: fillDTO(UserResponse, await this.userService.findById(author))
       }
     );
   }

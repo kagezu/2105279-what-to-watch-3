@@ -115,7 +115,7 @@ paths:
         "403":
           description: Выход не выполнен
 
-  /users/{id}/avatar:
+  /users/avatar:
     post:
       tags:
         - users

@@ -18,6 +18,11 @@ import UpdateFilmDto from './dto/update-film.dto.js';
 import { Genre } from '../../types/genre.type.js';
 import { DocumentExistsMiddleware } from '../../common/middlewares/document-exists.middleware.js';
 import UserResponse from '../user/response/user.response.js';
+import { FavoriteServiceInterface } from '../favorite/favorite-service.interface.js';
+import { PrivateRouteMiddleware } from '../../common/middlewares/private-route.middleware.js';
+import FilmDetailResponse from './response/film-detail.response.js';
+import { DocumentType } from '@typegoose/typegoose';
+import { FilmEntity } from './film.entity.js';
 
 @injectable()
 export default class FilmController extends Controller {
@@ -26,6 +31,7 @@ export default class FilmController extends Controller {
     @inject(Component.UserServiceInterface) private readonly userService: UserServiceInterface,
     @inject(Component.FilmServiceInterface) private readonly filmService: FilmServiceInterface,
     @inject(Component.CommentServiceInterface) private readonly commentService: CommentServiceInterface,
+    @inject(Component.FavoriteServiceInterface) private readonly favoriteService: FavoriteServiceInterface,
   ) {
     super(logger);
     this.logger.info('Register routes for FilmController…');
@@ -34,7 +40,10 @@ export default class FilmController extends Controller {
       path: '/',
       method: HttpMethod.Post,
       handler: this.create,
-      middlewares: [new ValidateDtoMiddleware(CreateFilmDto)]
+      middlewares: [
+        new PrivateRouteMiddleware(),
+        new ValidateDtoMiddleware(CreateFilmDto)
+      ]
     });
     this.addRoute({ path: '/', method: HttpMethod.Get, handler: this.index });
     this.addRoute({ path: '/promo', method: HttpMethod.Get, handler: this.promo });
@@ -52,6 +61,7 @@ export default class FilmController extends Controller {
       method: HttpMethod.Patch,
       handler: this.update,
       middlewares: [
+        new PrivateRouteMiddleware(),
         new ValidateObjectIdMiddleware('id'),
         new ValidateDtoMiddleware(UpdateFilmDto),
         new DocumentExistsMiddleware(this.filmService, 'Film', 'id')
@@ -62,6 +72,7 @@ export default class FilmController extends Controller {
       method: HttpMethod.Delete,
       handler: this.delete,
       middlewares: [
+        new PrivateRouteMiddleware(),
         new ValidateObjectIdMiddleware('id'),
         new DocumentExistsMiddleware(this.filmService, 'Film', 'id')
       ]
@@ -74,44 +85,76 @@ export default class FilmController extends Controller {
   }
 
   public async create(
-    { body }: Request<Record<string, unknown>, Record<string, unknown>, CreateFilmDto>,
+    { body, user }: Request<Record<string, unknown>, Record<string, unknown>, CreateFilmDto>,
     res: Response,
   ): Promise<void> {
-    const result = await this.filmService.create(body);
+    const result = await this.filmService.create({ ...body, user: user.id });
     this.send(
       res,
       StatusCodes.CREATED,
       {
-        ...fillDTO(FilmResponse, result),
+        ...fillDTO(FilmDetailResponse, result),
         user: fillDTO(
           UserResponse,
-          await this.userService.findById(body.user)
+          await this.userService.findById(user.id)
         )
       }
     );
   }
 
   public async update(req: Request, res: Response): Promise<void> {
-    const result = await this.filmService.update(req.params.id, req.body);
-    this.send(
-      res,
-      StatusCodes.CREATED,
-      fillDTO(FilmResponse, result)
+    const { body, user } = req;
+    const film = await this.filmService.show(req.params.id);
+
+    if (film?.user?.toString() === user.id) {
+      const result = await this.filmService.update(req.params.id, body);
+      const response = await this.addFavoriteField(result, user.id);
+      this.send(
+        res,
+        StatusCodes.CREATED,
+        fillDTO(FilmDetailResponse, response)
+      );
+    }
+
+    throw new HttpError(
+      StatusCodes.CONFLICT,
+      'Update must only author',
+      'UserController'
     );
   }
 
   public async delete(req: Request, res: Response): Promise<void> {
-    await this.commentService.delete(req.params.id);
-    const result = await this.filmService.delete(req.params.id);
-    this.send(
-      res,
-      StatusCodes.OK,
-      fillDTO(FilmResponse, result)
+    const filmId = req.params.id;
+    const { user } = req;
+    const film = await this.filmService.show(filmId);
+
+    if (film?.user?.toString() === user.id) {
+      await this.commentService.delete(filmId);
+      await this.favoriteService.deleteAll(filmId);
+      const result = await this.filmService.delete(filmId);
+      this.send(
+        res,
+        StatusCodes.OK,
+        fillDTO(FilmResponse, result)
+      );
+    }
+
+    throw new HttpError(
+      StatusCodes.CONFLICT,
+      'Delete must only author',
+      'UserController'
     );
+
   }
 
-  public async index(_req: Request, res: Response): Promise<void> {
+  public async index({ user }: Request, res: Response): Promise<void> {
     const result = await this.filmService.index();
+    if (user) {
+      for (const key in result) {
+        result[key].isFavorite = await this.favoriteService.exists({ film: result[key].id, user: user.id });
+      }
+    }
+
     const response = result.map((value) => fillDTO(FilmResponse, value));
     this.send(
       res,
@@ -122,19 +165,21 @@ export default class FilmController extends Controller {
 
   public async show(req: Request, res: Response): Promise<void> {
     const result = await this.filmService.show(req.params.id);
+    const response = await this.addFavoriteField(result, req.user.id);
     this.send(
       res,
       StatusCodes.OK,
-      fillDTO(FilmResponse, result)
+      fillDTO(FilmDetailResponse, response)
     );
   }
 
-  public async promo(_req: Request, res: Response): Promise<void> {
+  public async promo(req: Request, res: Response): Promise<void> {
     const result = await this.filmService.promo();
+    const response = await this.addFavoriteField(result, req.user.id);
     this.send(
       res,
       StatusCodes.OK,
-      fillDTO(FilmResponse, result)
+      fillDTO(FilmDetailResponse, response)
     );
   }
 
@@ -159,10 +204,22 @@ export default class FilmController extends Controller {
       );
     }
 
+    if (req.user) {
+      for (const key in result) {
+        result[key].isFavorite = await this.favoriteService.exists({ film: result[key].id, user: req.user.id });
+      }
+    }
     this.send(
       res,
       StatusCodes.OK,
       fillDTO(FilmResponse, result)
     );
+  }
+
+  private async addFavoriteField<T extends DocumentType<FilmEntity> | null>(film: T, user: string): Promise<T> {
+    return ({
+      ...film,
+      isFavorite: await this.favoriteService.exists({ film: film?._id.toString(), user })
+    });
   }
 }
