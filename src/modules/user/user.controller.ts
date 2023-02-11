@@ -13,10 +13,10 @@ import UserResponse from './response/user.response.js';
 import { ConfigInterface } from '../../common/config/config.interface.js';
 import LoginUserDto from './dto/login-user.dto.js';
 import { ValidateDtoMiddleware } from '../../common/middlewares/validate-dto.middleware.js';
-import { ValidateObjectIdMiddleware } from '../../common/middlewares/validate-objectid.middleware.js';
 import { UploadFileMiddleware } from '../../common/middlewares/upload-file.middleware.js';
 import LoggedUserResponse from './response/logged-user.response.js';
 import { JWT_ALGORITM } from './user.constant.js';
+import { PrivateRouteMiddleware } from '../../common/middlewares/private-route.middleware.js';
 
 @injectable()
 export default class UserController extends Controller {
@@ -41,22 +41,29 @@ export default class UserController extends Controller {
       middlewares: [new ValidateDtoMiddleware(LoginUserDto)]
     });
     this.addRoute({
-      path: '/:id/avatar',
+      path: '/avatar',
       method: HttpMethod.Post,
       handler: this.uploadAvatar,
       middlewares: [
-        new ValidateObjectIdMiddleware('id'),
+        new PrivateRouteMiddleware(),
         new UploadFileMiddleware(this.configService.get('UPLOAD_DIRECTORY'), 'avatar'),
       ]
     });
   }
 
   public async create(
-    { body }: Request<Record<string, unknown>, Record<string, unknown>, CreateUserDto>,
+    { body, user }: Request<Record<string, unknown>, Record<string, unknown>, CreateUserDto>,
     res: Response,
   ): Promise<void> {
-    const existsUser = await this.userService.findByEmail(body.email);
+    if (user) {
+      throw new HttpError(
+        StatusCodes.CONFLICT,
+        'User already authorized.',
+        'UserController'
+      );
+    }
 
+    const existsUser = await this.userService.findByEmail(body.email);
     if (existsUser) {
       throw new HttpError(
         StatusCodes.CONFLICT,
