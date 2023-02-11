@@ -1,4 +1,4 @@
-import { IsMongoId, IsString, Length, Max, Min } from 'class-validator';
+import { IsString, Length, Max, Min } from 'class-validator';
 import { CommentOption } from '../comment.constant.js';
 
 export default class CreateCommentDto {
@@ -14,6 +14,5 @@ export default class CreateCommentDto {
   @Max(CommentOption.MaxRates, { message: `Max rates is ${CommentOption.MaxRates}` })
   public rating!: number;
 
-  @IsMongoId({ message: 'user field must be a valid id' })
   public author!: string;
 }

@@ -20,8 +20,8 @@ export default class CommentService implements CommentServiceInterface {
       ...dto,
       film: filmId
     });
-    this.logger.info(`New Comment created: ${dto.text}`);
 
+    this.logger.info(`New Comment created: ${dto.text}`);
     return result;
   }
 
