@@ -1,4 +1,4 @@
 export default class SwitchFavoriteDto {
-  public film!: string;
-  public user!: string;
+  public film?: string;
+  public user?: string;
 }

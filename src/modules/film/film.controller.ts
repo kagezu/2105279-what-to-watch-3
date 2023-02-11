@@ -21,6 +21,8 @@ import UserResponse from '../user/response/user.response.js';
 import { FavoriteServiceInterface } from '../favorite/favorite-service.interface.js';
 import { PrivateRouteMiddleware } from '../../common/middlewares/private-route.middleware.js';
 import FilmDetailResponse from './response/film-detail.response.js';
+import { DocumentType } from '@typegoose/typegoose';
+import { FilmEntity } from './film.entity.js';
 
 @injectable()
 export default class FilmController extends Controller {
@@ -95,8 +97,7 @@ export default class FilmController extends Controller {
         user: fillDTO(
           UserResponse,
           await this.userService.findById(user.id)
-        ),
-        isFavorite: false
+        )
       }
     );
   }
@@ -107,10 +108,11 @@ export default class FilmController extends Controller {
 
     if (film?.user?.toString() === user.id) {
       const result = await this.filmService.update(req.params.id, body);
+      const response = await this.addFavoriteField(result, user.id);
       this.send(
         res,
         StatusCodes.CREATED,
-        fillDTO(FilmDetailResponse, result)
+        fillDTO(FilmDetailResponse, response)
       );
     }
 
@@ -145,8 +147,14 @@ export default class FilmController extends Controller {
 
   }
 
-  public async index(_req: Request, res: Response): Promise<void> {
+  public async index({ user }: Request, res: Response): Promise<void> {
     const result = await this.filmService.index();
+    if (user) {
+      for (const key in result) {
+        result[key].isFavorite = await this.favoriteService.exists({ film: result[key].id, user: user.id });
+      }
+    }
+
     const response = result.map((value) => fillDTO(FilmResponse, value));
     this.send(
       res,
@@ -157,19 +165,21 @@ export default class FilmController extends Controller {
 
   public async show(req: Request, res: Response): Promise<void> {
     const result = await this.filmService.show(req.params.id);
+    const response = await this.addFavoriteField(result, req.user.id);
     this.send(
       res,
       StatusCodes.OK,
-      fillDTO(FilmDetailResponse, result)
+      fillDTO(FilmDetailResponse, response)
     );
   }
 
-  public async promo(_req: Request, res: Response): Promise<void> {
+  public async promo(req: Request, res: Response): Promise<void> {
     const result = await this.filmService.promo();
+    const response = await this.addFavoriteField(result, req.user.id);
     this.send(
       res,
       StatusCodes.OK,
-      fillDTO(FilmDetailResponse, result)
+      fillDTO(FilmDetailResponse, response)
     );
   }
 
@@ -194,10 +204,22 @@ export default class FilmController extends Controller {
       );
     }
 
+    if (req.user) {
+      for (const key in result) {
+        result[key].isFavorite = await this.favoriteService.exists({ film: result[key].id, user: req.user.id });
+      }
+    }
     this.send(
       res,
       StatusCodes.OK,
       fillDTO(FilmResponse, result)
     );
+  }
+
+  private async addFavoriteField<T extends DocumentType<FilmEntity> | null>(film: T, user: string): Promise<T> {
+    return ({
+      ...film,
+      isFavorite: await this.favoriteService.exists({ film: film?._id.toString(), user })
+    });
   }
 }

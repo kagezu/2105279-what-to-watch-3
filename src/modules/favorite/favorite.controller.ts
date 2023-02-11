@@ -64,6 +64,6 @@ export default class FavoriteController extends Controller {
 
   public async index(req: Request, res: Response): Promise<void> {
     const result = await this.favoriteService.index(req.user.id);
-    this.ok(res, result.map((value) => fillDTO(FilmResponse, value.film)));
+    this.ok(res, result.map((value) => fillDTO(FilmResponse, { ...value.film, isFavorite: true })));
   }
 }

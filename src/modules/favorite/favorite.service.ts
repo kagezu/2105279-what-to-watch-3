@@ -40,4 +40,9 @@ export default class FavoriteService implements FavoriteServiceInterface {
       })
       .exec();
   }
+
+  public async exists(dto: SwitchFavoriteDto): Promise<boolean> {
+    return (await this.favoriteModel
+      .exists(dto)) !== null;
+  }
 }
