@@ -12,8 +12,6 @@ import { ValidateObjectIdMiddleware } from '../../common/middlewares/validate-ob
 import { DocumentExistsMiddleware } from '../../common/middlewares/document-exists.middleware.js';
 import { PrivateRouteMiddleware } from '../../common/middlewares/private-route.middleware.js';
 
-const DEFAULT_USER_ID = '63e4c6f21a7187b4ec0bd2fe';
-
 @injectable()
 export default class FavoriteController extends Controller {
   constructor(
@@ -53,19 +51,19 @@ export default class FavoriteController extends Controller {
   }
 
   public async create(req: Request, res: Response,): Promise<void> {
-    await this.favoriteService.create(req.body);
+    await this.favoriteService.create({ film: req.params.id, user: req.user.id });
     const result = await this.filmService.show(req.params.id);
     this.ok(res, fillDTO(FilmResponse, result));
   }
 
   public async delete(req: Request, res: Response): Promise<void> {
-    await this.favoriteService.delete(req.body);
+    await this.favoriteService.delete({ film: req.params.id, user: req.user.id });
     const result = await this.filmService.show(req.params.id);
     this.ok(res, fillDTO(FilmResponse, result));
   }
 
-  public async index(_req: Request, res: Response): Promise<void> {
-    const result = await this.favoriteService.index(DEFAULT_USER_ID);
+  public async index(req: Request, res: Response): Promise<void> {
+    const result = await this.favoriteService.index(req.user.id);
     this.ok(res, result.map((value) => fillDTO(FilmResponse, value.film)));
   }
 }

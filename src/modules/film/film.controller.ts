@@ -82,10 +82,10 @@ export default class FilmController extends Controller {
   }
 
   public async create(
-    { body }: Request<Record<string, unknown>, Record<string, unknown>, CreateFilmDto>,
+    { body, user }: Request<Record<string, unknown>, Record<string, unknown>, CreateFilmDto>,
     res: Response,
   ): Promise<void> {
-    const result = await this.filmService.create(body);
+    const result = await this.filmService.create({ ...body, user: user.id });
     this.send(
       res,
       StatusCodes.CREATED,
@@ -93,31 +93,54 @@ export default class FilmController extends Controller {
         ...fillDTO(FilmResponse, result),
         user: fillDTO(
           UserResponse,
-          await this.userService.findById(body.user)
+          await this.userService.findById(user.id)
         )
       }
     );
   }
 
   public async update(req: Request, res: Response): Promise<void> {
-    const result = await this.filmService.update(req.params.id, req.body);
-    this.send(
-      res,
-      StatusCodes.CREATED,
-      fillDTO(FilmResponse, result)
+    const { body, user } = req;
+    const film = await this.filmService.show(req.params.id);
+
+    if (film?.user?.toString() === user.id) {
+      const result = await this.filmService.update(req.params.id, body);
+      this.send(
+        res,
+        StatusCodes.CREATED,
+        fillDTO(FilmResponse, result)
+      );
+    }
+
+    throw new HttpError(
+      StatusCodes.CONFLICT,
+      'Update must only author',
+      'UserController'
     );
   }
 
   public async delete(req: Request, res: Response): Promise<void> {
     const filmId = req.params.id;
-    await this.commentService.delete(filmId);
-    await this.favoriteService.deleteAll(filmId);
-    const result = await this.filmService.delete(filmId);
-    this.send(
-      res,
-      StatusCodes.OK,
-      fillDTO(FilmResponse, result)
+    const { user } = req;
+    const film = await this.filmService.show(filmId);
+
+    if (film?.user?.toString() === user.id) {
+      await this.commentService.delete(filmId);
+      await this.favoriteService.deleteAll(filmId);
+      const result = await this.filmService.delete(filmId);
+      this.send(
+        res,
+        StatusCodes.OK,
+        fillDTO(FilmResponse, result)
+      );
+    }
+
+    throw new HttpError(
+      StatusCodes.CONFLICT,
+      'Delete must only author',
+      'UserController'
     );
+
   }
 
   public async index(_req: Request, res: Response): Promise<void> {

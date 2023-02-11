@@ -1,5 +1,5 @@
 import { Genre } from '../../../types/genre.type.js';
-import { IsArray, IsEnum, IsHexColor, IsInt, IsMongoId, IsString, IsUrl, MaxLength, MinLength } from 'class-validator';
+import { IsArray, IsEnum, IsHexColor, IsInt, IsString, IsUrl, MaxLength, MinLength } from 'class-validator';
 import { FilmOption } from '../film.constant.js';
 
 export default class CreateFilmDto {
@@ -34,7 +34,6 @@ export default class CreateFilmDto {
   @IsInt({ message: 'Runtime must be integer' })
   public runTime!: number;
 
-  @IsMongoId({ message: 'User field must be valid an id' })
   public user!: string;
 
   @IsUrl({}, { message: 'Released must be URL' })
