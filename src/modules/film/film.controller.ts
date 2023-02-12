@@ -108,11 +108,11 @@ export default class FilmController extends Controller {
 
     if (film?.user?.toString() === user.id) {
       const result = await this.filmService.update(req.params.id, body);
-      const response = await this.addFavoriteField(result, user.id);
+      await this.addFavoriteField(result, user.id);
       this.send(
         res,
         StatusCodes.CREATED,
-        fillDTO(FilmDetailResponse, response)
+        fillDTO(FilmDetailResponse, result)
       );
     }
 
@@ -150,9 +150,7 @@ export default class FilmController extends Controller {
   public async index({ user }: Request, res: Response): Promise<void> {
     const result = await this.filmService.index();
     if (user) {
-      for (const key in result) {
-        result[key].isFavorite = await this.favoriteService.exists({ film: result[key].id, user: user.id });
-      }
+      await Promise.all(result.map(async (film) => this.addFavoriteField(film, user.id)));
     }
 
     const response = result.map((value) => fillDTO(FilmResponse, value));
@@ -165,26 +163,27 @@ export default class FilmController extends Controller {
 
   public async show(req: Request, res: Response): Promise<void> {
     const result = await this.filmService.show(req.params.id);
-    const response = await this.addFavoriteField(result, req.user.id);
+    await this.addFavoriteField(result, req.user.id);
     this.send(
       res,
       StatusCodes.OK,
-      fillDTO(FilmDetailResponse, response)
+      fillDTO(FilmDetailResponse, result)
     );
   }
 
   public async promo(req: Request, res: Response): Promise<void> {
     const result = await this.filmService.promo();
-    const response = await this.addFavoriteField(result, req.user.id);
+    await this.addFavoriteField(result, req.user.id);
     this.send(
       res,
       StatusCodes.OK,
-      fillDTO(FilmDetailResponse, response)
+      fillDTO(FilmDetailResponse, result)
     );
   }
 
   public async findByGenre(req: Request, res: Response): Promise<void> {
     const { genre } = req.params;
+    const { user } = req;
 
     if (!Object.values(Genre).some((value) => value === genre)) {
       throw new HttpError(
@@ -204,10 +203,8 @@ export default class FilmController extends Controller {
       );
     }
 
-    if (req.user) {
-      for (const key in result) {
-        result[key].isFavorite = await this.favoriteService.exists({ film: result[key].id, user: req.user.id });
-      }
+    if (user) {
+      await Promise.all(result.map(async (film) => this.addFavoriteField(film, user.id)));
     }
     this.send(
       res,
@@ -217,9 +214,9 @@ export default class FilmController extends Controller {
   }
 
   private async addFavoriteField<T extends DocumentType<FilmEntity> | null>(film: T, user: string): Promise<T> {
-    return ({
-      ...film,
-      isFavorite: await this.favoriteService.exists({ film: film?._id.toString(), user })
-    });
+    if (film) {
+      film.isFavorite = await this.favoriteService.exists({ film: film?._id.toString(), user });
+    }
+    return film;
   }
 }

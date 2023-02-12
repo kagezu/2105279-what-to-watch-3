@@ -53,7 +53,7 @@ export default class FavoriteController extends Controller {
   public async create(req: Request, res: Response,): Promise<void> {
     await this.favoriteService.create({ film: req.params.id, user: req.user.id });
     const result = await this.filmService.show(req.params.id);
-    this.ok(res, fillDTO(FilmResponse, result));
+    this.ok(res, fillDTO(FilmResponse, { ...result, isFavorite: true }));
   }
 
   public async delete(req: Request, res: Response): Promise<void> {

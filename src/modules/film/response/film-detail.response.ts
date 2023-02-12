@@ -52,5 +52,5 @@ export default class FilmDetailResponse {
   public color!: string;
 
   @Expose()
-  public isFavorite!: string;
+  public isFavorite!: boolean;
 }
