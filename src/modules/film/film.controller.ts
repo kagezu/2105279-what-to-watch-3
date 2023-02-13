@@ -24,6 +24,7 @@ import FilmDetailResponse from './response/film-detail.response.js';
 import { DocumentType } from '@typegoose/typegoose';
 import { FilmEntity } from './film.entity.js';
 import { ConfigInterface } from '../../common/config/config.interface.js';
+import { UploadFileMiddleware } from '../../common/middlewares/upload-file.middleware.js';
 
 @injectable()
 export default class FilmController extends Controller {
@@ -83,6 +84,24 @@ export default class FilmController extends Controller {
       path: '/genre/:genre',
       method: HttpMethod.Get,
       handler: this.findByGenre
+    });
+    this.addRoute({
+      path: '/:id/background',
+      method: HttpMethod.Post,
+      handler: this.uploadBackgroundImage,
+      middlewares: [
+        new PrivateRouteMiddleware(),
+        new UploadFileMiddleware(this.configService.get('UPLOAD_DIRECTORY'), 'background'),
+      ]
+    });
+    this.addRoute({
+      path: '/:id/poster',
+      method: HttpMethod.Post,
+      handler: this.uploadPosterImage,
+      middlewares: [
+        new PrivateRouteMiddleware(),
+        new UploadFileMiddleware(this.configService.get('UPLOAD_DIRECTORY'), 'poster'),
+      ]
     });
   }
 
@@ -213,6 +232,20 @@ export default class FilmController extends Controller {
       StatusCodes.OK,
       fillDTO(FilmResponse, result)
     );
+  }
+
+  public async uploadPosterImage(req: Request, res: Response) {
+    const { id } = req.params;
+    const updateDto = { posterImage: req.file?.filename };
+    await this.filmService.update(id, updateDto);
+    this.created(res, fillDTO(FilmDetailResponse, updateDto));
+  }
+
+  public async uploadBackgroundImage(req: Request, res: Response) {
+    const { id } = req.params;
+    const updateDto = { backgroundImage: req.file?.filename };
+    await this.filmService.update(id, updateDto);
+    this.created(res, fillDTO(FilmDetailResponse, updateDto));
   }
 
   private async addFavoriteField<T extends DocumentType<FilmEntity> | null>(film: T, user: string): Promise<T> {

@@ -36,12 +36,6 @@ export default class CreateFilmDto {
 
   public user!: string;
 
-  @IsUrl({}, { message: 'Released must be URL' })
-  public posterImage!: string;
-
-  @IsUrl({}, { message: 'Released must be URL' })
-  public backgroundImage!: string;
-
   @IsHexColor({ message: 'Color must be hex format' })
   public color!: string;
 }
