@@ -16,6 +16,7 @@ import { DocumentExistsMiddleware } from '../../common/middlewares/document-exis
 import UserResponse from '../user/response/user.response.js';
 import { UserServiceInterface } from '../user/user-service.interface.js';
 import { PrivateRouteMiddleware } from '../../common/middlewares/private-route.middleware.js';
+import { ConfigInterface } from '../../common/config/config.interface.js';
 
 @injectable()
 export default class CommentController extends Controller {
@@ -24,8 +25,9 @@ export default class CommentController extends Controller {
     @inject(Component.CommentServiceInterface) private readonly commentService: CommentServiceInterface,
     @inject(Component.FilmServiceInterface) private readonly filmService: FilmServiceInterface,
     @inject(Component.UserServiceInterface) private readonly userService: UserServiceInterface,
+    @inject(Component.ConfigInterface) configService: ConfigInterface,
   ) {
-    super(logger);
+    super(logger, configService);
 
     this.logger.info('Register routes for CommentController…');
 

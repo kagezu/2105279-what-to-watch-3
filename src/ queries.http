@@ -27,7 +27,7 @@ Content-Type: application/json
 
 ## Проверка токена пользователя
 GET http://localhost:3123/users/login HTTP/1.1
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InRlc3Q0QHRlc3QubmV0IiwiaWQiOiI2M2U0Yzc4ODFhNzE4N2I0ZWMwYmQzMGMiLCJpYXQiOjE2NzYxMDAyMjUsImV4cCI6MTY3NjI3MzAyNX0.mGncNDRa5RnpSC2R-sYlFrSn7lw_kBu4omO64f9vbK4
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InRlc3Q0QHRlc3QubmV0IiwiaWQiOiI2M2U0Yzc4ODFhNzE4N2I0ZWMwYmQzMGMiLCJpYXQiOjE2NzYyNzMxNjUsImV4cCI6MTY3NjQ0NTk2NX0.xO16lhKhvh_E0FoCa_2QaZzLOQQugLQj9nwD36EtETg
 
 ###
 
@@ -150,7 +150,7 @@ Content-Type: application/json
 
 ###
 
-# Загрузки
+# Изображения
 
 ## Отправка аватарки пользователю
 
@@ -166,3 +166,7 @@ Content-Type: image/png
 ------WebKitFormBoundary7MA4YWxkTrZu0gW--
 
 ###
+## Запрос аватарки пользователю
+
+GET  http://localhost:3123/static/default-avatar.jpg HTTP/1.1
+

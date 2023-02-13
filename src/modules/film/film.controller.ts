@@ -23,6 +23,7 @@ import { PrivateRouteMiddleware } from '../../common/middlewares/private-route.m
 import FilmDetailResponse from './response/film-detail.response.js';
 import { DocumentType } from '@typegoose/typegoose';
 import { FilmEntity } from './film.entity.js';
+import { ConfigInterface } from '../../common/config/config.interface.js';
 
 @injectable()
 export default class FilmController extends Controller {
@@ -32,8 +33,9 @@ export default class FilmController extends Controller {
     @inject(Component.FilmServiceInterface) private readonly filmService: FilmServiceInterface,
     @inject(Component.CommentServiceInterface) private readonly commentService: CommentServiceInterface,
     @inject(Component.FavoriteServiceInterface) private readonly favoriteService: FavoriteServiceInterface,
+    @inject(Component.ConfigInterface) configService: ConfigInterface,
   ) {
-    super(logger);
+    super(logger, configService);
     this.logger.info('Register routes for FilmController…');
 
     this.addRoute({
