@@ -10,6 +10,7 @@ import { ControllerInterface } from '../common/controller/controller.interface.j
 import { ExceptionFilterInterface } from '../common/errors/exception-filter.interface.js';
 import { AuthenticateMiddleware } from '../common/middlewares/authenticate.middleware.js';
 import { getFullServerPath } from '../utils/common.js';
+import cors from 'cors';
 
 @injectable()
 export default class Application {
@@ -45,6 +46,7 @@ export default class Application {
     this.expressApp.use('/static', express.static(this.config.get('STATIC_DIRECTORY_PATH')));
     const authenticateMiddleware = new AuthenticateMiddleware(this.config.get('JWT_SECRET'));
     this.expressApp.use(authenticateMiddleware.execute.bind(authenticateMiddleware));
+    this.expressApp.use(cors());
   }
 
   public async init() {
