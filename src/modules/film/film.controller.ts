@@ -23,6 +23,8 @@ import { PrivateRouteMiddleware } from '../../common/middlewares/private-route.m
 import FilmDetailResponse from './response/film-detail.response.js';
 import { DocumentType } from '@typegoose/typegoose';
 import { FilmEntity } from './film.entity.js';
+import { ConfigInterface } from '../../common/config/config.interface.js';
+import { UploadFileMiddleware } from '../../common/middlewares/upload-file.middleware.js';
 
 @injectable()
 export default class FilmController extends Controller {
@@ -32,8 +34,9 @@ export default class FilmController extends Controller {
     @inject(Component.FilmServiceInterface) private readonly filmService: FilmServiceInterface,
     @inject(Component.CommentServiceInterface) private readonly commentService: CommentServiceInterface,
     @inject(Component.FavoriteServiceInterface) private readonly favoriteService: FavoriteServiceInterface,
+    @inject(Component.ConfigInterface) configService: ConfigInterface,
   ) {
-    super(logger);
+    super(logger, configService);
     this.logger.info('Register routes for FilmController…');
 
     this.addRoute({
@@ -82,6 +85,24 @@ export default class FilmController extends Controller {
       method: HttpMethod.Get,
       handler: this.findByGenre
     });
+    this.addRoute({
+      path: '/:id/background',
+      method: HttpMethod.Post,
+      handler: this.uploadBackgroundImage,
+      middlewares: [
+        new PrivateRouteMiddleware(),
+        new UploadFileMiddleware(this.configService.get('UPLOAD_DIRECTORY'), 'background'),
+      ]
+    });
+    this.addRoute({
+      path: '/:id/poster',
+      method: HttpMethod.Post,
+      handler: this.uploadPosterImage,
+      middlewares: [
+        new PrivateRouteMiddleware(),
+        new UploadFileMiddleware(this.configService.get('UPLOAD_DIRECTORY'), 'poster'),
+      ]
+    });
   }
 
   public async create(
@@ -108,11 +129,11 @@ export default class FilmController extends Controller {
 
     if (film?.user?.toString() === user.id) {
       const result = await this.filmService.update(req.params.id, body);
-      const response = await this.addFavoriteField(result, user.id);
+      await this.addFavoriteField(result, user.id);
       this.send(
         res,
         StatusCodes.CREATED,
-        fillDTO(FilmDetailResponse, response)
+        fillDTO(FilmDetailResponse, result)
       );
     }
 
@@ -150,9 +171,7 @@ export default class FilmController extends Controller {
   public async index({ user }: Request, res: Response): Promise<void> {
     const result = await this.filmService.index();
     if (user) {
-      for (const key in result) {
-        result[key].isFavorite = await this.favoriteService.exists({ film: result[key].id, user: user.id });
-      }
+      await Promise.all(result.map(async (film) => this.addFavoriteField(film, user.id)));
     }
 
     const response = result.map((value) => fillDTO(FilmResponse, value));
@@ -165,26 +184,27 @@ export default class FilmController extends Controller {
 
   public async show(req: Request, res: Response): Promise<void> {
     const result = await this.filmService.show(req.params.id);
-    const response = await this.addFavoriteField(result, req.user.id);
+    await this.addFavoriteField(result, req.user.id);
     this.send(
       res,
       StatusCodes.OK,
-      fillDTO(FilmDetailResponse, response)
+      fillDTO(FilmDetailResponse, result)
     );
   }
 
   public async promo(req: Request, res: Response): Promise<void> {
     const result = await this.filmService.promo();
-    const response = await this.addFavoriteField(result, req.user.id);
+    await this.addFavoriteField(result, req.user.id);
     this.send(
       res,
       StatusCodes.OK,
-      fillDTO(FilmDetailResponse, response)
+      fillDTO(FilmDetailResponse, result)
     );
   }
 
   public async findByGenre(req: Request, res: Response): Promise<void> {
     const { genre } = req.params;
+    const { user } = req;
 
     if (!Object.values(Genre).some((value) => value === genre)) {
       throw new HttpError(
@@ -204,10 +224,8 @@ export default class FilmController extends Controller {
       );
     }
 
-    if (req.user) {
-      for (const key in result) {
-        result[key].isFavorite = await this.favoriteService.exists({ film: result[key].id, user: req.user.id });
-      }
+    if (user) {
+      await Promise.all(result.map(async (film) => this.addFavoriteField(film, user.id)));
     }
     this.send(
       res,
@@ -216,10 +234,24 @@ export default class FilmController extends Controller {
     );
   }
 
+  public async uploadPosterImage(req: Request, res: Response) {
+    const { id } = req.params;
+    const updateDto = { posterImage: req.file?.filename };
+    await this.filmService.update(id, updateDto);
+    this.created(res, fillDTO(FilmDetailResponse, updateDto));
+  }
+
+  public async uploadBackgroundImage(req: Request, res: Response) {
+    const { id } = req.params;
+    const updateDto = { backgroundImage: req.file?.filename };
+    await this.filmService.update(id, updateDto);
+    this.created(res, fillDTO(FilmDetailResponse, updateDto));
+  }
+
   private async addFavoriteField<T extends DocumentType<FilmEntity> | null>(film: T, user: string): Promise<T> {
-    return ({
-      ...film,
-      isFavorite: await this.favoriteService.exists({ film: film?._id.toString(), user })
-    });
+    if (film) {
+      film.isFavorite = await this.favoriteService.exists({ film: film?._id.toString(), user });
+    }
+    return film;
   }
 }

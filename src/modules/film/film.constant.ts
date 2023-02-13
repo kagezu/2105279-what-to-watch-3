@@ -5,7 +5,7 @@ export const enum FilmOption {
   MaxLengthDescription = 1024,
   MinLengthProducerName = 2,
   MaxLengthProducerName = 50,
-  DefaultColor = 'black'
+  DefaultColor = '#000000'
 }
 
 export const DEFAULT_FILM_COUNT = 60;

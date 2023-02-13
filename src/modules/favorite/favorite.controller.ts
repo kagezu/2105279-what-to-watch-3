@@ -11,15 +11,17 @@ import FilmResponse from '../film/response/film.response.js';
 import { ValidateObjectIdMiddleware } from '../../common/middlewares/validate-objectid.middleware.js';
 import { DocumentExistsMiddleware } from '../../common/middlewares/document-exists.middleware.js';
 import { PrivateRouteMiddleware } from '../../common/middlewares/private-route.middleware.js';
+import { ConfigInterface } from '../../common/config/config.interface.js';
 
 @injectable()
 export default class FavoriteController extends Controller {
   constructor(
     @inject(Component.LoggerInterface) logger: LoggerInterface,
+    @inject(Component.ConfigInterface) configService: ConfigInterface,
     @inject(Component.FavoriteServiceInterface) private readonly favoriteService: FavoriteServiceInterface,
     @inject(Component.FilmServiceInterface) private readonly filmService: FilmServiceInterface
   ) {
-    super(logger);
+    super(logger, configService);
     this.logger.info('Register routes for UserController…');
 
     this.addRoute({
@@ -53,7 +55,7 @@ export default class FavoriteController extends Controller {
   public async create(req: Request, res: Response,): Promise<void> {
     await this.favoriteService.create({ film: req.params.id, user: req.user.id });
     const result = await this.filmService.show(req.params.id);
-    this.ok(res, fillDTO(FilmResponse, result));
+    this.ok(res, fillDTO(FilmResponse, { ...result, isFavorite: true }));
   }
 
   public async delete(req: Request, res: Response): Promise<void> {

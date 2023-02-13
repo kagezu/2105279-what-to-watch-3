@@ -25,5 +25,5 @@ export default class FilmResponse {
   public posterImage!: string;
 
   @Expose()
-  public isFavorite!: string;
+  public isFavorite!: boolean;
 }
