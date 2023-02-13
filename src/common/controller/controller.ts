@@ -41,7 +41,7 @@ export abstract class Controller implements ControllerInterface {
     transformObject(
       STATIC_RESOURCE_FIELDS,
       `${fullServerPath}/static`,
-      `${fullServerPath}/upload`,
+      `${fullServerPath}/image`,
       data
     );
   }
