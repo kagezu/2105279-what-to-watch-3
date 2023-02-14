@@ -118,7 +118,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InRlc3Q0QHRlc3QubmV0Iiwia
 
 {
   "text": "Фирменная упаковка сохранена?",
-  "rating": 7
+  "rating": -1
 }
 
 ###
