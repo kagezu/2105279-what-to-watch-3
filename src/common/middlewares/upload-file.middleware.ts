@@ -3,11 +3,14 @@ import { nanoid } from 'nanoid';
 import multer, { diskStorage } from 'multer';
 import mime from 'mime-types';
 import { MiddlewareInterface } from '../../types/middleware.interface.js';
+import HttpError from '../errors/http-error.js';
+import { StatusCodes } from 'http-status-codes';
 
 export class UploadFileMiddleware implements MiddlewareInterface {
   constructor(
     private uploadDirectory: string,
     private fieldName: string,
+    private extensions: string[]
   ) { }
 
   public async execute(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -15,6 +18,13 @@ export class UploadFileMiddleware implements MiddlewareInterface {
       destination: this.uploadDirectory,
       filename: (_req, file, callback) => {
         const extension = mime.extension(file.mimetype);
+        if (!this.extensions.some((it) => it === extension)) {
+          throw new HttpError(
+            StatusCodes.BAD_REQUEST,
+            `File type  not supported, usr only: ${this.extensions.join(', ')}`,
+            'UploadFileMiddleware'
+          );
+        }
         const filename = nanoid();
         callback(null, `${filename}.${extension}`);
       }

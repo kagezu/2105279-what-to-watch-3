@@ -91,7 +91,7 @@ export default class FilmController extends Controller {
       handler: this.uploadBackgroundImage,
       middlewares: [
         new PrivateRouteMiddleware(),
-        new UploadFileMiddleware(this.configService.get('UPLOAD_DIRECTORY'), 'background'),
+        new UploadFileMiddleware(this.configService.get('UPLOAD_DIRECTORY'), 'background', ['jpg']),
       ]
     });
     this.addRoute({
@@ -100,7 +100,7 @@ export default class FilmController extends Controller {
       handler: this.uploadPosterImage,
       middlewares: [
         new PrivateRouteMiddleware(),
-        new UploadFileMiddleware(this.configService.get('UPLOAD_DIRECTORY'), 'poster'),
+        new UploadFileMiddleware(this.configService.get('UPLOAD_DIRECTORY'), 'poster', ['jpg']),
       ]
     });
   }
