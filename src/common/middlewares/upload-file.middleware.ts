@@ -18,15 +18,16 @@ export class UploadFileMiddleware implements MiddlewareInterface {
       destination: this.uploadDirectory,
       filename: (_req, file, callback) => {
         const extension = mime.extension(file.mimetype);
-        if (!this.extensions.some((it) => it === extension)) {
-          throw new HttpError(
-            StatusCodes.BAD_REQUEST,
-            `File type  not supported, usr only: ${this.extensions.join(', ')}`,
-            'UploadFileMiddleware'
-          );
-        }
         const filename = nanoid();
-        callback(null, `${filename}.${extension}`);
+        callback(
+          this.extensions.some((it) => it === extension)
+            ? null
+            : new HttpError(
+              StatusCodes.BAD_REQUEST,
+              `File type  not supported, use only: ${this.extensions.join(', ')}`,
+              'UploadFileMiddleware'),
+          `${filename}.${extension}`
+        );
       }
     });
 
